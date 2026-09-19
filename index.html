@@ -174,6 +174,9 @@ h2 em{font-style:italic;color:var(--tomate)}
   position:absolute;inset:0;width:100%;height:100%;
   object-fit:cover;object-position:center;border:0;
 }
+/* zoom da foto da capa: aumente o scale para aproximar mais.
+   O segundo valor do transform-origin sobe ou desce o corte. */
+.moldura .foto img{transform:scale(1.12);transform-origin:center 12%}
 .foto .legenda{
   position:absolute;left:12px;bottom:12px;
   background:rgba(247,243,232,.94);color:var(--tinta-suave);
