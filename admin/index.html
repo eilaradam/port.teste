@@ -335,6 +335,49 @@ textarea.roteiro{
 }
 textarea.roteiro:focus{outline:none;background:#fff;border-color:var(--amarelo);box-shadow:0 0 0 3px rgba(212,160,23,.2)}
 
+/* ---------- transcrições ---------- */
+.grade-transcricoes{display:grid;grid-template-columns:repeat(auto-fill,minmax(230px,1fr));gap:14px}
+.cartao-tr{
+  display:block;width:100%;text-align:left;cursor:pointer;padding:0;overflow:hidden;
+  background:var(--papel);border:1px solid var(--borda);border-left:4px solid var(--amarelo);
+  border-radius:var(--raio);transition:transform .18s ease,border-color .18s ease;
+}
+.cartao-tr:hover{transform:translateY(-2px);border-color:var(--amarelo)}
+.cartao-tr.favorita{border-left-color:var(--tomate)}
+.tr-capa{display:block;position:relative;aspect-ratio:16/9;background:linear-gradient(140deg,#efe9d9,#dcbe6a 70%,#8a6a12)}
+.tr-capa img{position:absolute;inset:0;width:100%;height:100%;object-fit:cover}
+.tr-corpo{padding:11px 13px 14px}
+.tr-corpo h4{font-size:.87rem;font-weight:800;line-height:1.3}
+.tr-corpo p{font-size:.76rem;color:var(--tinta-suave);margin-top:4px;
+  display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden}
+.p-youtube{background:rgba(199,75,52,.15);color:#8f2f1c}
+.p-instagram{background:rgba(63,107,122,.17);color:#2f5462}
+.p-tiktok{background:rgba(43,40,34,.12);color:#3d3930}
+.p-outro{background:rgba(138,133,122,.2);color:#6a6559}
+.tr-detalhe{display:grid;grid-template-columns:340px 1fr;gap:18px;align-items:start}
+.tr-video{position:relative;background:#000;border-radius:var(--raio);overflow:hidden}
+.tr-video.vertical{aspect-ratio:9/16}
+.tr-video.alto{height:620px}
+.tr-video iframe{position:absolute;inset:0;width:100%;height:100%;border:0}
+.tr-sem-preview{
+  background:var(--creme);border:1px dashed var(--borda);border-radius:var(--raio);
+  padding:20px;text-align:center;font-size:.84rem;color:var(--tinta-suave);
+}
+textarea.transcricao{
+  width:100%;min-height:260px;font:inherit;font-size:.86rem;line-height:1.65;
+  background:var(--creme);border:1px solid var(--borda);border-radius:var(--raio-p);
+  padding:12px;resize:vertical;color:var(--tinta);
+}
+textarea.transcricao:focus{outline:none;background:#fff;border-color:var(--amarelo);box-shadow:0 0 0 3px rgba(212,160,23,.2)}
+.passo{
+  display:flex;gap:10px;align-items:flex-start;font-size:.83rem;
+  padding:8px 0;border-bottom:1px solid var(--borda-leve);color:var(--tinta-suave);
+}
+.passo:last-child{border-bottom:0}
+.passo b{flex:0 0 20px;height:20px;border-radius:50%;background:rgba(212,160,23,.2);
+  color:var(--amarelo-escuro);display:grid;place-items:center;font-size:.7rem}
+@media(max-width:900px){ .tr-detalhe{grid-template-columns:1fr} .tr-video.alto{height:520px} }
+
 /* ---------- janelas ---------- */
 .fundo-janela{
   position:fixed;inset:0;z-index:120;background:rgba(43,40,34,.55);
@@ -424,6 +467,10 @@ textarea.roteiro:focus{outline:none;background:#fff;border-color:var(--amarelo);
       <button class="item" type="button" data-aba="campanhas">
         <svg viewBox="0 0 24 24"><rect x="2" y="7" width="20" height="13" rx="2"/><path d="M9 7V5a2 2 0 0 1 2-2h2a2 2 0 0 1 2 2v2M2 13h20"/></svg>
         Campanhas
+      </button>
+      <button class="item" type="button" data-aba="transcricoes">
+        <svg viewBox="0 0 24 24"><path d="M12 3a3 3 0 0 1 3 3v5a3 3 0 0 1-6 0V6a3 3 0 0 1 3-3z"/><path d="M5 11a7 7 0 0 0 14 0M12 18v3M9 21h6"/></svg>
+        Transcrições
       </button>
       <button class="item" type="button" data-aba="checklist">
         <svg viewBox="0 0 24 24"><path d="M9 5h11M9 12h11M9 19h11M4 5l1.5 1.5L8 4M4 12l1.5 1.5L8 11M4 19l1.5 1.5L8 18"/></svg>
@@ -535,7 +582,7 @@ textarea.roteiro:focus{outline:none;background:#fff;border-color:var(--amarelo);
      DADOS
      Tudo que falhar vira aviso na tela, nunca tela em branco.
      ===================================================================== */
-  const dados = { videos:[], marcas:[], calendario:[], campanhas:[], visitas:[], marcados:{} };
+  const dados = { videos:[], marcas:[], calendario:[], campanhas:[], visitas:[], marcados:{}, transcricoes:[] };
   const avisos = [];
 
   function explicarErro(tabela, e){
@@ -649,7 +696,8 @@ textarea.roteiro:focus{outline:none;background:#fff;border-color:var(--amarelo);
       ler('calendario', 'data', true),
       ler('campanhas', 'criado_em', false),
       ler('visitas', 'data', true),
-      ler('marcados', null, true)
+      ler('marcados', null, true),
+      ler('transcricoes', 'criado_em', false)
     ]);
     dados.videos     = resultado[0];
     dados.marcas     = resultado[1];
@@ -658,6 +706,7 @@ textarea.roteiro:focus{outline:none;background:#fff;border-color:var(--amarelo);
     dados.visitas    = resultado[4];
     dados.marcados   = {};
     resultado[5].forEach(function(m){ if (m && m.marcado){ dados.marcados[m.chave] = true; } });
+    dados.transcricoes = resultado[6];
 
     if (!window.Biblioteca){
       registrarAviso({ tipo:'outro', texto:'O arquivo js/biblioteca.js não carregou, então a aba Checklist vai aparecer vazia.' });
@@ -747,6 +796,7 @@ textarea.roteiro:focus{outline:none;background:#fff;border-color:var(--amarelo);
     marcas:     { titulo:'Marcas',     sub:'A sua base de contatos de empresa.',                      desenhar: desenharMarcas },
     calendario: { titulo:'Calendário', sub:'O que gravar, editar e postar em cada dia.',              desenhar: desenharCalendario },
     campanhas:  { titulo:'Campanhas',  sub:'Os trabalhos fechados, com valor, prazo e pagamento.',    desenhar: desenharCampanhas },
+    transcricoes:{ titulo:'Transcrições', sub:'Os conteúdos que você gosta, com o roteiro salvo e as suas anotações.', desenhar: desenharTranscricoes },
     checklist:  { titulo:'Checklist',  sub:'O material de consulta para deixar o portfólio redondo.', desenhar: desenharChecklist }
   };
   let abaAtual = 'portfolio';
@@ -1698,6 +1748,244 @@ textarea.roteiro:focus{outline:none;background:#fff;border-color:var(--amarelo);
       }
     });
   });
+
+  /* =====================================================================
+     ABA · TRANSCRIÇÕES
+     O TokScript é um site, não tem uma porta de entrada que eu possa
+     chamar daqui de dentro. Então o caminho é: abrir lá, copiar o
+     roteiro e colar aqui. O painel guarda tudo junto do vídeo.
+     ===================================================================== */
+  const TOKSCRIPT = 'https://tokscript.com';
+  let telaTranscricao = 'lista';
+  let transcricaoAberta = null;
+  let buscaTranscricao = '';
+
+  function plataformaDoLink(link){
+    const l = String(link || '').toLowerCase();
+    if (l.indexOf('tiktok.com') >= 0){ return 'tiktok'; }
+    if (l.indexOf('instagram.com') >= 0){ return 'instagram'; }
+    if (l.indexOf('youtube.com') >= 0 || l.indexOf('youtu.be') >= 0){ return 'youtube'; }
+    return 'outro';
+  }
+
+  /* monta o endereço que dá para mostrar dentro de um quadrinho */
+  function enderecoParaVer(link){
+    const p = plataformaDoLink(link);
+    if (p === 'youtube'){
+      const id = idDoYoutube(link);
+      return id ? { url:'https://www.youtube-nocookie.com/embed/' + id, alto:false } : null;
+    }
+    if (p === 'tiktok'){
+      const m = String(link).match(/video\/(\d+)/) || String(link).match(/\/(\d{15,})/);
+      return m ? { url:'https://www.tiktok.com/embed/v2/' + m[1], alto:true } : null;
+    }
+    if (p === 'instagram'){
+      const m = String(link).match(/instagram\.com\/(reel|reels|p|tv)\/([A-Za-z0-9_-]+)/);
+      if (!m){ return null; }
+      const tipo = m[1] === 'reels' ? 'reel' : m[1];
+      return { url:'https://www.instagram.com/' + tipo + '/' + m[2] + '/embed', alto:true };
+    }
+    return null;
+  }
+
+  function capaDaTranscricao(link){
+    if (plataformaDoLink(link) !== 'youtube'){ return ''; }
+    const id = idDoYoutube(link);
+    return id ? 'https://i.ytimg.com/vi/' + id + '/maxresdefault.jpg' : '';
+  }
+
+  function desenharTranscricoes(){
+    if (telaTranscricao === 'detalhe' && transcricaoAberta){ telaDetalheTranscricao(); return; }
+    telaListaTranscricoes();
+  }
+
+  function telaListaTranscricoes(){
+    $('#acaoDaAba').innerHTML =
+      '<a class="botao claro" href="' + TOKSCRIPT + '" target="_blank" rel="noopener" ' +
+      'style="text-decoration:none">abrir o TokScript</a>';
+
+    const lista = dados.transcricoes.filter(function(t){
+      if (!buscaTranscricao){ return true; }
+      const alvo = semAcento((t.titulo||'') + ' ' + (t.obs||'') + ' ' + (t.transcricao||'') + ' ' + (t.link||''));
+      return alvo.indexOf(semAcento(buscaTranscricao)) >= 0;
+    });
+
+    let html = '<div class="caixa"><p class="caixa-titulo">guardar um conteúdo novo</p>' +
+      '<div class="barra-ferramentas" style="margin:0">' +
+        '<input class="busca" id="linkNovo" type="url" placeholder="cole aqui o link do YouTube, Instagram ou TikTok">' +
+        '<button class="botao" type="button" id="guardarLink">guardar</button>' +
+      '</div>' +
+      '<div style="margin-top:12px">' +
+        '<div class="passo"><b>1</b><span>Cole o link aqui em cima e clique em guardar. O vídeo já aparece para você assistir.</span></div>' +
+        '<div class="passo"><b>2</b><span>Dentro do conteúdo, clique em "pegar o roteiro no TokScript". Ele abre em outra aba com o link junto.</span></div>' +
+        '<div class="passo"><b>3</b><span>Copie a transcrição de lá, cole no campo do roteiro, escreva as suas observações e salve.</span></div>' +
+      '</div></div>';
+
+    html += '<div class="barra-ferramentas">' +
+      '<input class="busca" id="buscaTr" type="search" placeholder="buscar por título, roteiro ou anotação" value="' + escapar(buscaTranscricao) + '">' +
+      '</div>';
+
+    if (!dados.transcricoes.length){
+      html += '<p class="vazio">Você ainda não guardou nenhum conteúdo. Cole o primeiro link aí em cima. ' +
+              'A ideia é juntar os vídeos que te inspiram com o roteiro deles escrito, para consultar na hora de gravar o seu.</p>';
+    } else if (!lista.length){
+      html += '<p class="vazio">Nenhum conteúdo com essa busca.</p>';
+    } else {
+      html += '<div class="grade-transcricoes">' + lista.map(function(t){
+        const capa = capaDaTranscricao(t.link);
+        const plat = plataformaDoLink(t.link);
+        return '<button class="cartao-tr' + (t.favorita ? ' favorita' : '') + '" type="button" data-tr="' + t.id + '">' +
+          (capa ? '<span class="tr-capa"><img src="' + escapar(capa) + '" alt="" loading="lazy" decoding="async"></span>' : '') +
+          '<span class="tr-corpo" style="display:block">' +
+            '<span class="pilula p-' + plat + '">' + plat + '</span>' +
+            (t.favorita ? ' <span class="pilula p-pendente">favorito</span>' : '') +
+            '<h4 style="margin-top:7px">' + escapar(t.titulo || 'sem título') + '</h4>' +
+            '<p>' + escapar(t.obs || t.transcricao || 'sem roteiro salvo ainda') + '</p>' +
+          '</span></button>';
+      }).join('') + '</div>' +
+      '<p style="margin-top:12px;font-size:.78rem;color:var(--apagado)">' + lista.length + ' de ' + dados.transcricoes.length + ' conteúdos guardados.</p>';
+    }
+
+    $('#painel').innerHTML = html;
+
+    $('#guardarLink').addEventListener('click', guardarLinkNovo);
+    $('#linkNovo').addEventListener('keydown', function(ev){
+      if (ev.key === 'Enter'){ ev.preventDefault(); guardarLinkNovo(); }
+    });
+    const busca = $('#buscaTr');
+    busca.addEventListener('input', function(){
+      buscaTranscricao = busca.value;
+      const pos = busca.selectionStart;
+      telaListaTranscricoes();
+      const nova = $('#buscaTr');
+      nova.focus();
+      try{ nova.setSelectionRange(pos,pos); }catch(e){}
+    });
+    $$('[data-tr]').forEach(function(b){
+      b.addEventListener('click', function(){
+        transcricaoAberta = dados.transcricoes.filter(function(x){ return String(x.id) === b.dataset.tr; })[0];
+        telaTranscricao = 'detalhe';
+        desenharTranscricoes();
+      });
+    });
+  }
+
+  async function guardarLinkNovo(){
+    const campo = $('#linkNovo');
+    const link = campo.value.trim();
+    if (!link){ avisinho('Cole um link primeiro.'); campo.focus(); return; }
+
+    const registro = {
+      link: link,
+      plataforma: plataformaDoLink(link),
+      titulo: '',
+      transcricao: '',
+      obs: '',
+      favorita: false
+    };
+    const r = await gravar('transcricoes', registro);
+    if (!r.ok){ return; }
+    if (r.linha){ dados.transcricoes.unshift(r.linha); transcricaoAberta = r.linha; }
+    avisinho('Conteúdo guardado. Agora pegue o roteiro.');
+    telaTranscricao = 'detalhe';
+    desenharTranscricoes();
+  }
+
+  function telaDetalheTranscricao(){
+    const t = transcricaoAberta;
+    const ver = enderecoParaVer(t.link);
+    const plat = plataformaDoLink(t.link);
+
+    $('#acaoDaAba').innerHTML = '<button class="botao claro" type="button" id="voltarLista">voltar para a lista</button>';
+
+    let html = '<div class="tr-detalhe">' +
+      '<div>' +
+        (ver
+          ? '<div class="tr-video ' + (ver.alto ? 'alto' : 'vertical') + '">' +
+              '<iframe src="' + escapar(ver.url) + '" title="Conteúdo guardado" loading="lazy" ' +
+              'allow="accelerometer; clipboard-write; encrypted-media; gyroscope; picture-in-picture" allowfullscreen></iframe>' +
+            '</div>'
+          : '<div class="tr-sem-preview">Não consegui montar a janelinha do vídeo para este link. ' +
+            'Use o botão abaixo para abrir no site de origem.</div>') +
+        '<div style="display:flex;gap:8px;flex-wrap:wrap;margin-top:10px">' +
+          '<a class="botao claro" href="' + escapar(t.link) + '" target="_blank" rel="noopener" style="text-decoration:none">abrir o original</a>' +
+          '<button class="botao" type="button" id="irTokScript">pegar o roteiro no TokScript</button>' +
+        '</div>' +
+      '</div>' +
+      '<div>' +
+        '<div style="display:flex;align-items:center;gap:8px;margin-bottom:12px">' +
+          '<span class="pilula p-' + plat + '">' + plat + '</span>' +
+          '<button class="estrela ' + (t.favorita ? 'marcada' : '') + '" type="button" id="favoritarTr" ' +
+            'aria-label="' + (t.favorita ? 'Tirar dos favoritos' : 'Marcar como favorito') + '">' +
+            '<svg viewBox="0 0 24 24"><path d="M12 3l2.7 5.6 6.1.9-4.4 4.3 1 6.1-5.4-2.9-5.4 2.9 1-6.1L3.2 9.5l6.1-.9z"/></svg></button>' +
+          '<span style="flex:1"></span>' +
+          '<button class="botao claro" type="button" id="apagarTr">apagar</button>' +
+        '</div>' +
+        campoTexto('trTitulo','título (como você quer lembrar dele)', t.titulo) +
+        campoTexto('trLink','link', t.link, 'url') +
+        '<div class="campo"><label for="trTranscricao">roteiro (a transcrição)</label>' +
+          '<textarea class="transcricao" id="trTranscricao" placeholder="Cole aqui o roteiro que você copiou do TokScript.">' + escapar(t.transcricao || '') + '</textarea></div>' +
+        '<div class="campo"><label for="trObs">as minhas observações</label>' +
+          '<textarea id="trObs" style="min-height:110px" placeholder="O que funcionou aqui? O gancho, o corte, a fala? O que dá para adaptar para a sua marca?">' + escapar(t.obs || '') + '</textarea></div>' +
+        '<div class="janela-pe" style="justify-content:flex-start">' +
+          '<button class="botao" type="button" id="salvarTr">salvar</button>' +
+        '</div>' +
+      '</div>' +
+    '</div>';
+
+    $('#painel').innerHTML = html;
+
+    $('#voltarLista').addEventListener('click', function(){
+      telaTranscricao = 'lista';
+      transcricaoAberta = null;
+      desenharTranscricoes();
+    });
+
+    $('#irTokScript').addEventListener('click', function(){
+      const endereco = plat === 'instagram'
+        ? TOKSCRIPT + '/instagram-transcript-generator'
+        : TOKSCRIPT;
+      /* o link vai junto na hora de abrir; se o site não usar, é só
+         colar lá do mesmo jeito, o endereço já está copiado abaixo */
+      window.open(endereco + '?url=' + encodeURIComponent(t.link), '_blank', 'noopener');
+      try{ navigator.clipboard.writeText(t.link); avisinho('TokScript aberto, e o link já está copiado para colar lá.'); }
+      catch(e){ avisinho('TokScript aberto numa aba nova.'); }
+    });
+
+    $('#favoritarTr').addEventListener('click', async function(){
+      const novo = !t.favorita;
+      const r = await gravar('transcricoes', { id:t.id, favorita:novo });
+      if (r.ok){ t.favorita = novo; desenharTranscricoes(); }
+    });
+
+    $('#apagarTr').addEventListener('click', function(){
+      confirmar('Apagar ' + (t.titulo || 'este conteúdo') + ' e o roteiro dele?', async function(){
+        if (await apagar('transcricoes', t.id)){
+          dados.transcricoes = dados.transcricoes.filter(function(x){ return x.id !== t.id; });
+          telaTranscricao = 'lista';
+          transcricaoAberta = null;
+          avisinho('Conteúdo apagado.');
+          desenharTranscricoes();
+        }
+      });
+    });
+
+    $('#salvarTr').addEventListener('click', async function(){
+      const registro = {
+        id: t.id,
+        titulo: $('#trTitulo').value.trim(),
+        link: $('#trLink').value.trim(),
+        plataforma: plataformaDoLink($('#trLink').value.trim()),
+        transcricao: $('#trTranscricao').value,
+        obs: $('#trObs').value
+      };
+      const r = await gravar('transcricoes', registro);
+      if (!r.ok){ return; }
+      Object.assign(t, registro);
+      avisinho('Salvo.');
+      desenharTranscricoes();
+    });
+  }
 
   /* =====================================================================
      ABA 5 · CHECKLIST

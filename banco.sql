@@ -328,14 +328,42 @@ where not exists (select 1 from public.campanhas);
 
 
 -- ============================================================
---  PARTE 7 · CONFERINDO SE A TRANCA FUNCIONOU
+--  PARTE 7 · A TABELA DE TRANSCRIÇÕES
 --
---  Rode a consulta abaixo depois do Run. Ela lista as seis
---  tabelas e diz se o RLS está ligado. As seis precisam
+--  Os conteúdos que você guarda para estudar: o link do vídeo,
+--  o roteiro escrito e as suas anotações.
+--
+--  É material só seu. Não tem nenhuma brecha para quem não fez
+--  login: ninguém de fora lê, escreve ou apaga nada daqui.
+-- ============================================================
+create table if not exists public.transcricoes (
+  id           bigint generated always as identity primary key,
+  link         text not null default '',
+  plataforma   text not null default '',
+  titulo       text not null default '',
+  transcricao  text not null default '',
+  obs          text not null default '',
+  favorita     boolean not null default false,
+  criado_em    timestamptz not null default now()
+);
+
+alter table public.transcricoes enable row level security;
+
+drop policy if exists "dona faz tudo em transcricoes" on public.transcricoes;
+create policy "dona faz tudo em transcricoes" on public.transcricoes
+  for all to authenticated
+  using (public.sou_a_dona()) with check (public.sou_a_dona());
+
+
+-- ============================================================
+--  PARTE 8 · CONFERINDO SE A TRANCA FUNCIONOU
+--
+--  Rode a consulta abaixo depois do Run. Ela lista as sete
+--  tabelas e diz se o RLS está ligado. As sete precisam
 --  aparecer com rls_ligado = true.
 -- ============================================================
 select tablename as tabela, rowsecurity as rls_ligado
 from pg_tables
 where schemaname = 'public'
-  and tablename in ('videos','marcas','calendario','campanhas','marcados','visitas')
+  and tablename in ('videos','marcas','calendario','campanhas','marcados','visitas','transcricoes')
 order by tablename;
