@@ -448,6 +448,37 @@ h1 .sobrenome{display:block;font-style:italic;color:var(--amarelo-escuro)}
 }
 
 /* =========================================================
+   PLAYER: o vídeo abre dentro do site, sem sair para o YouTube
+   A largura segue a altura da tela para o vídeo vertical ficar
+   o maior possível, que é o que faz o YouTube servir mais qualidade.
+   ========================================================= */
+.fundo-player{
+  position:fixed;inset:0;z-index:130;background:rgba(43,40,34,.86);
+  display:flex;align-items:center;justify-content:center;padding:16px;
+  animation:aparece .2s ease;
+}
+.player{
+  width:min(94vw, 620px, calc(82vh * 9 / 16));
+  display:flex;flex-direction:column;gap:10px;
+}
+.player-topo{display:flex;align-items:center;justify-content:space-between;gap:14px}
+.player-titulo{
+  margin:0;color:#fff;font-family:'Lora',serif;font-size:1.25rem;line-height:1.2;
+}
+.player-quadro{
+  position:relative;width:100%;aspect-ratio:9/16;
+  background:#000;border-radius:14px;overflow:hidden;
+  box-shadow:0 26px 60px rgba(0,0,0,.45);
+}
+.player-quadro iframe{position:absolute;inset:0;width:100%;height:100%;border:0}
+.player-link{
+  align-self:center;color:#fff;font-size:.85rem;font-weight:700;
+  text-decoration:none;border-bottom:2px solid var(--amarelo);padding-bottom:2px;
+}
+.player-link:hover{color:var(--amarelo)}
+.player-topo .fechar{position:static;flex:0 0 auto}
+
+/* =========================================================
    CARD DE CAPTURA (mídia kit)
    ========================================================= */
 .fundo-modal{
@@ -750,6 +781,19 @@ body.card-aberto{overflow:hidden}
   <ul id="barraSemana"></ul>
 </nav>
 
+<!-- ============================ PLAYER DO VÍDEO ============================ -->
+<div class="fundo-player" id="fundoPlayer" hidden>
+  <div class="player" id="modalPlayer" role="dialog" aria-modal="true" aria-labelledby="tituloPlayer">
+    <div class="player-topo">
+      <p class="player-titulo" id="tituloPlayer">Vídeo</p>
+      <button class="fechar" type="button" id="fecharPlayer" aria-label="Fechar o vídeo">×</button>
+    </div>
+    <!-- o iframe entra aqui só na hora de assistir e sai ao fechar, para o vídeo parar -->
+    <div class="player-quadro" id="playerQuadro"></div>
+    <a class="player-link" id="linkYoutube" href="#" target="_blank" rel="noopener">abrir no YouTube, em tela cheia</a>
+  </div>
+</div>
+
 <!-- ============================ CARD DE CAPTURA ============================ -->
 <div class="fundo-modal" id="fundoModal" hidden>
   <div class="modal" role="dialog" aria-modal="true" aria-labelledby="tituloModal" id="modalKit">
@@ -1001,6 +1045,7 @@ body.card-aberto{overflow:hidden}
   $('#gradeDestaques').innerHTML = DESTAQUES.map(function(d,i){
     /* o card inteiro é um link: o endereço é montado a partir do id do vídeo */
     return '<a class="card-video revelar" href="' + linkDoVideo(d.id) + '" target="_blank" rel="noopener" ' +
+             'data-id="' + d.id + '" data-titulo="' + d.titulo + '" ' +
              'aria-label="Assistir o vídeo que fiz para ' + d.titulo + '">' +
              /* capa vertical 9:16: a miniatura do youtube por cima do degradê */
              '<div class="foto capa-video" style="background:' + degrade(i) + '">' +
@@ -1030,6 +1075,7 @@ body.card-aberto{overflow:hidden}
     /* cada card abre o vídeo no youtube e usa a miniatura dele como capa */
     return '<a class="card-trabalho revelar" href="' + linkDoVideo(t.id) + '" target="_blank" ' +
              'rel="noopener" data-nicho="' + t.nicho + '" ' +
+             'data-id="' + t.id + '" data-titulo="' + t.marca + '" ' +
              'aria-label="Assistir o vídeo que fiz para ' + t.marca + '">' +
              '<div class="foto" style="background:' + degrade(i) + '">' +
                '<img src="' + capaDoVideo(t.id) + '" loading="lazy" decoding="async" ' +
@@ -1254,6 +1300,62 @@ body.card-aberto{overflow:hidden}
     formContato.hidden = false;
     formContato.reset();
     $('#nome').focus();
+  });
+
+  /* ---------- player: assistir sem sair do site ---------- */
+  const fundoPlayer = $('#fundoPlayer');
+  const quadro = $('#playerQuadro');
+  let focoAntesDoVideo = null;
+
+  function abrirPlayer(id, titulo){
+    focoAntesDoVideo = document.activeElement;
+    $('#tituloPlayer').textContent = titulo;
+    $('#linkYoutube').href = linkDoVideo(id);
+    /* vq=hd1080 pede a melhor qualidade; o YouTube ainda decide pelo
+       tamanho do player e pela conexão de quem está assistindo */
+    quadro.innerHTML = '<iframe src="https://www.youtube-nocookie.com/embed/' + id +
+      '?autoplay=1&rel=0&playsinline=1&modestbranding=1&vq=hd1080" ' +
+      'title="Vídeo que fiz para ' + titulo + '" ' +
+      'allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share" ' +
+      'allowfullscreen></iframe>';
+    fundoPlayer.hidden = false;
+    document.body.classList.add('card-aberto');
+    $('#fecharPlayer').focus();
+    document.addEventListener('keydown', teclasPlayer);
+  }
+
+  function fecharPlayer(){
+    fundoPlayer.hidden = true;
+    quadro.innerHTML = '';
+    document.body.classList.remove('card-aberto');
+    document.removeEventListener('keydown', teclasPlayer);
+    if (focoAntesDoVideo && focoAntesDoVideo.focus){ focoAntesDoVideo.focus(); }
+  }
+
+  function teclasPlayer(ev){
+    if (ev.key === 'Escape'){ fecharPlayer(); return; }
+    if (ev.key !== 'Tab'){ return; }
+    const focaveis = $$('button, [href], iframe', $('#modalPlayer'));
+    if (!focaveis.length){ return; }
+    const primeiro = focaveis[0], ultimo = focaveis[focaveis.length - 1];
+    if (ev.shiftKey && document.activeElement === primeiro){ ev.preventDefault(); ultimo.focus(); }
+    else if (!ev.shiftKey && document.activeElement === ultimo){ ev.preventDefault(); primeiro.focus(); }
+  }
+
+  $('#fecharPlayer').addEventListener('click', fecharPlayer);
+  fundoPlayer.addEventListener('mousedown', function(ev){
+    if (ev.target === fundoPlayer){ fecharPlayer(); }
+  });
+
+  /* o card continua sendo um link de verdade: sem script, ou com ctrl/cmd,
+     ele abre o vídeo no YouTube como antes */
+  [$('#gradeTrabalhos'), $('#gradeDestaques')].forEach(function(grade){
+    grade.addEventListener('click', function(ev){
+      const card = ev.target.closest('a[data-id]');
+      if (!card || ev.metaKey || ev.ctrlKey || ev.shiftKey || ev.altKey){ return; }
+      ev.preventDefault();
+      abrirPlayer(card.dataset.id, card.dataset.titulo || 'Vídeo');
+    });
   });
 
   /* ---------- card de captura do mídia kit ---------- */
