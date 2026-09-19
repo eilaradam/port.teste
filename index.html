@@ -56,6 +56,9 @@ body{
 }
 
 img{max-width:100%;display:block;height:auto}
+/* o hidden do html precisa vencer o display das regras dos cards,
+   senao o filtro marca o card como escondido e ele continua na tela */
+[hidden]{display:none !important}
 a{color:inherit}
 h1,h2,h3{font-family:'Lora',Georgia,serif;font-weight:600;margin:0}
 p{margin:0 0 1rem}
@@ -832,12 +835,12 @@ body.card-aberto{overflow:hidden}
     { chave:"todos",       rotulo:"todos" },
     { chave:"beleza",      rotulo:"beleza" },
     { chave:"casa",        rotulo:"casa e decoração" },
-    { chave:"moda",        rotulo:"moda" },
-    { chave:"tech",        rotulo:"tech e apps" },
     { chave:"gastronomia", rotulo:"gastronomia" },
     { chave:"drinks",      rotulo:"drinks e sobremesas" },
     { chave:"saude",       rotulo:"saúde e fitness" },
     { chave:"financas",    rotulo:"finanças" },
+    { chave:"tech",        rotulo:"tech e apps" },
+    { chave:"moda",        rotulo:"moda" },
     { chave:"viagem",      rotulo:"viagem" }
   ];
 
