@@ -546,11 +546,16 @@ body.card-aberto{overflow:hidden}
         </div>
 
         <!-- FOTO DA CAPA
-             Para usar a sua foto: apague a div .foto abaixo e coloque
-             <img class="foto" src="sua-foto.jpg" alt="Lara Damasceno gravando um vídeo"> -->
+             Para trocar de foto, substitua os dois arquivos da pasta fotos
+             (lara-capa.webp e lara-capa.jpg) mantendo os mesmos nomes.
+             O degradê continua atrás como reserva, caso a imagem não carregue. -->
         <figure class="moldura revelar" style="margin:0">
-          <div class="foto" style="aspect-ratio:4/5;background:linear-gradient(145deg,#f4edda 0%,#e6d195 52%,#c9a43a 100%)" role="img" aria-label="Espaço reservado para a foto da creator, formato 4 por 5">
-            <span class="legenda">foto da creator 4:5</span>
+          <div class="foto" style="aspect-ratio:4/5;background:linear-gradient(145deg,#f4edda 0%,#e6d195 52%,#c9a43a 100%)">
+            <picture>
+              <source srcset="fotos/lara-capa.webp" type="image/webp">
+              <img src="fotos/lara-capa.jpg" width="724" height="1086" fetchpriority="high" decoding="async"
+                   alt="Lara Damasceno sentada em uma poltrona, com a mão apoiada no rosto, sorrindo para a câmera">
+            </picture>
           </div>
           <span class="adesivo" aria-hidden="true">gravado ✓</span>
         </figure>
