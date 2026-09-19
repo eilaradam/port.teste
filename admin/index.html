@@ -1027,24 +1027,58 @@ textarea.roteiro:focus{outline:none;background:#fff;border-color:var(--amarelo);
   function formVideo(v){
     const novo = !v;
     v = v || { titulo:'', link:'', nicho:'', formato:'vídeo 9:16', marca:'', destaque:'', visivel:true };
+
+    /* O nicho vira uma lista com os que já existem, em vez de campo
+       livre. Digitar "casa e decoração" onde os outros vídeos usam
+       "casa" criaria um filtro novo e separado lá no site. */
+    const nichosEmUso = [];
+    dados.videos.forEach(function(x){
+      const n = (x.nicho || '').trim();
+      if (n && nichosEmUso.indexOf(n) < 0){ nichosEmUso.push(n); }
+    });
+    nichosEmUso.sort();
+    if (v.nicho && nichosEmUso.indexOf(v.nicho) < 0){ nichosEmUso.push(v.nicho); }
+    const opcoesNicho = nichosEmUso.map(function(n){ return { v:n, t:n }; })
+      .concat([{ v:'__novo__', t:'criar um nicho novo...' }]);
+
     const fundo = abrirJanela(novo ? 'Novo vídeo' : 'Editar vídeo',
       '<form id="formVideo">' +
         campoTexto('vMarca','marca', v.marca) +
         campoTexto('vTitulo','título (a linha curta embaixo do nome)', v.titulo) +
         campoTexto('vLink','link do vídeo', v.link, 'url') +
-        '<div class="dupla">' + campoTexto('vNicho','nicho', v.nicho) + campoTexto('vFormato','formato', v.formato) + '</div>' +
+        '<div class="dupla">' +
+          campoLista('vNicho','nicho', v.nicho || (nichosEmUso[0] || '__novo__'), opcoesNicho) +
+          campoTexto('vFormato','formato', v.formato) +
+        '</div>' +
+        '<div class="campo" id="caixaNichoNovo" hidden>' +
+          '<label for="vNichoNovo">nome do nicho novo</label>' +
+          '<input type="text" id="vNichoNovo" placeholder="ex: pets">' +
+          '<span style="display:block;font-size:.74rem;color:var(--apagado);margin-top:4px">' +
+          'Isso cria um botão de filtro novo no site. Escreva tudo em minúsculo e sem acento.</span>' +
+        '</div>' +
         campoTexto('vDestaque','destaque (ex: 2,4M views). Deixe vazio se não tiver.', v.destaque) +
         campoLista('vVisivel','aparece no site?', v.visivel === false ? 'nao' : 'sim', [{v:'sim',t:'sim, aparece'},{v:'nao',t:'não, fica escondido'}]) +
         pe(novo ? 'Adicionar' : 'Salvar') +
       '</form>');
 
+    /* mostra o campo de escrever só quando ela escolhe criar um nicho novo */
+    const listaNicho = $('#vNicho', fundo);
+    function conferirNicho(){
+      $('#caixaNichoNovo', fundo).hidden = listaNicho.value !== '__novo__';
+    }
+    listaNicho.addEventListener('change', conferirNicho);
+    conferirNicho();
+
     $('#formVideo', fundo).addEventListener('submit', async function(ev){
       ev.preventDefault();
+      const nichoEscolhido = listaNicho.value === '__novo__'
+        ? $('#vNichoNovo').value.trim()
+        : listaNicho.value;
       const registro = {
         marca:   $('#vMarca').value.trim(),
         titulo:  $('#vTitulo').value.trim(),
         link:    $('#vLink').value.trim(),
-        nicho:   $('#vNicho').value.trim(),
+        nicho:   nichoEscolhido,
         formato: $('#vFormato').value.trim(),
         destaque:$('#vDestaque').value.trim(),
         visivel: $('#vVisivel').value === 'sim'
