@@ -323,6 +323,10 @@ h1 .sobrenome{display:block;font-style:italic;color:var(--amarelo-escuro)}
 }
 .aviso-filtro{margin-top:16px;font-size:.86rem;color:var(--tinta-suave);text-align:center}
 .mais-trabalhos{display:flex;justify-content:center;margin-top:30px}
+.selo{
+  position:absolute;top:8px;left:8px;background:rgba(43,40,34,.82);color:#fff;
+  font-size:.66rem;font-weight:800;letter-spacing:.04em;padding:3px 9px;border-radius:999px;
+}
 .play-pequeno{width:46px;height:46px}
 .play-pequeno::after{
   margin-left:4px;border-left:14px solid var(--tomate);
@@ -821,6 +825,8 @@ body.card-aberto{overflow:hidden}
   </div>
 </div>
 
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+<script src="js/banco.js"></script>
 <script>
 (function(){
   'use strict';
@@ -1023,6 +1029,7 @@ body.card-aberto{overflow:hidden}
   const $  = function(s,e){ return (e||document).querySelector(s); };
   const $$ = function(s,e){ return Array.prototype.slice.call((e||document).querySelectorAll(s)); };
   const menosMovimento = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+  let obsRevelar = null;
   const degrade = function(i){ return DEGRADES[i % DEGRADES.length]; };
   /* monta o endereço do vídeo e da capa a partir do id do youtube */
   const linkDoVideo = function(id){ return 'https://youtube.com/shorts/' + id; };
@@ -1062,44 +1069,90 @@ body.card-aberto{overflow:hidden}
            '</a>';
   }).join('');
 
-  /* ---------- filtros e galeria de trabalhos ---------- */
-  $('#filtros').innerHTML = NICHOS.map(function(n,i){
-    return '<button class="filtro" type="button" data-nicho="' + n.chave + '" aria-pressed="' + (i === 0) + '">' + n.rotulo + '</button>';
-  }).join('');
+  /* ---------- filtros e galeria de trabalhos ----------
+     A galeria é montada por uma função, porque ela é desenhada
+     duas vezes: primeiro com a lista que está aqui no arquivo,
+     na hora, e depois de novo com o que vier do banco. Assim o
+     site nunca abre vazio, nem se o banco estiver fora do ar. */
 
-  function rotuloDoNicho(chave){
-    return (NICHOS.filter(function(n){ return n.chave === chave; })[0] || {}).rotulo || chave;
-  }
-
-  $('#gradeTrabalhos').innerHTML = TRABALHOS.map(function(t,i){
-    /* cada card abre o vídeo no youtube e usa a miniatura dele como capa */
-    return '<a class="card-trabalho revelar" href="' + linkDoVideo(t.id) + '" target="_blank" ' +
-             'rel="noopener" data-nicho="' + t.nicho + '" ' +
-             'data-id="' + t.id + '" data-titulo="' + t.marca + '" ' +
-             'aria-label="Assistir o vídeo que fiz para ' + t.marca + '">' +
-             '<div class="foto" style="background:' + degrade(i) + '">' +
-               '<img src="' + capaDoVideo(t.id) + '" loading="lazy" decoding="async" ' +
-                    'alt="Capa do vídeo que fiz para ' + t.marca + '">' +
-               '<span class="play play-pequeno" aria-hidden="true"></span>' +
-             '</div>' +
-             '<div class="texto">' +
-               '<h3>' + t.marca + '</h3>' +
-               '<p>' + (t.nota || 'vídeo UGC 9:16') + '</p>' +
-               '<span class="tag">' + rotuloDoNicho(t.nicho) + '</span>' +
-             '</div>' +
-           '</a>';
-  }).join('');
-
-  /* se alguma miniatura não carregar, some com ela e fica o degradê atrás */
-  $$('#gradeTrabalhos img, #gradeDestaques img').forEach(function(img){
-    img.addEventListener('error', function(){ img.remove(); });
-  });
-
-  const cards = $$('#gradeTrabalhos .card-trabalho');
-  const aviso = $('#avisoFiltro');
+  let listaNichos = NICHOS;
+  const aviso   = $('#avisoFiltro');
   const btnMais = $('#verMais');
+  let cards = [];
   let nichoAtual = 'todos';
   let quantos = POR_PAGINA;
+
+  function rotuloDoNicho(chave){
+    return (listaNichos.filter(function(n){ return n.chave === chave; })[0] || {}).rotulo || chave;
+  }
+
+  /* monta a lista de filtros só com os nichos que têm vídeo */
+  function nichosPresentes(lista){
+    const tem = {};
+    lista.forEach(function(t){ tem[t.nicho] = true; });
+    const saida = [{ chave:'todos', rotulo:'todos' }];
+    NICHOS.forEach(function(n){
+      if (n.chave !== 'todos' && tem[n.chave]){ saida.push(n); delete tem[n.chave]; }
+    });
+    Object.keys(tem).forEach(function(k){ saida.push({ chave:k, rotulo:k }); });
+    return saida;
+  }
+
+  function montarGaleria(lista){
+    listaNichos = nichosPresentes(lista);
+    nichoAtual = 'todos';
+    quantos = POR_PAGINA;
+
+    $('#filtros').innerHTML = listaNichos.map(function(n,i){
+      return '<button class="filtro" type="button" data-nicho="' + n.chave + '" aria-pressed="' + (i === 0) + '">' + n.rotulo + '</button>';
+    }).join('');
+
+    $('#gradeTrabalhos').innerHTML = lista.map(function(t,i){
+      /* cada card abre o vídeo e usa a miniatura dele como capa */
+      const endereco = t.id ? linkDoVideo(t.id) : (t.link || '#');
+      return '<a class="card-trabalho revelar" href="' + endereco + '" target="_blank" ' +
+               'rel="noopener" data-nicho="' + t.nicho + '" ' +
+               (t.id ? 'data-id="' + t.id + '" ' : '') +
+               'data-titulo="' + t.marca + '" ' +
+               'aria-label="Assistir o vídeo que fiz para ' + t.marca + '">' +
+               '<div class="foto" style="background:' + degrade(i) + '">' +
+                 (t.id ? '<img src="' + capaDoVideo(t.id) + '" loading="lazy" decoding="async" ' +
+                      'alt="Capa do vídeo que fiz para ' + t.marca + '">' : '') +
+                 '<span class="play play-pequeno" aria-hidden="true"></span>' +
+                 (t.destaque ? '<span class="selo">' + t.destaque + '</span>' : '') +
+               '</div>' +
+               '<div class="texto">' +
+                 '<h3>' + t.marca + '</h3>' +
+                 '<p>' + (t.nota || 'vídeo UGC 9:16') + '</p>' +
+                 '<span class="tag">' + rotuloDoNicho(t.nicho) + '</span>' +
+               '</div>' +
+             '</a>';
+    }).join('');
+
+    /* se alguma miniatura não carregar, some com ela e fica o degradê atrás */
+    $$('#gradeTrabalhos img, #gradeDestaques img').forEach(function(img){
+      img.addEventListener('error', function(){ img.remove(); });
+    });
+
+    cards = $$('#gradeTrabalhos .card-trabalho');
+
+    $$('#filtros .filtro').forEach(function(b){
+      b.addEventListener('click', function(){
+        $$('#filtros .filtro').forEach(function(o){ o.setAttribute('aria-pressed','false'); });
+        b.setAttribute('aria-pressed','true');
+        nichoAtual = b.dataset.nicho;
+        quantos = POR_PAGINA;
+        mostrarTrabalhos();
+      });
+    });
+
+    mostrarTrabalhos();
+    if (!menosMovimento && 'IntersectionObserver' in window){
+      $$('#gradeTrabalhos .revelar').forEach(function(e){ obsRevelar.observe(e); });
+    } else {
+      $$('#gradeTrabalhos .revelar').forEach(function(e){ e.classList.add('visivel'); });
+    }
+  }
 
   function mostrarTrabalhos(){
     const doNicho = cards.filter(function(c){
@@ -1114,23 +1167,11 @@ body.card-aberto{overflow:hidden}
       (doNicho.length === 1 ? ' trabalho em ' : ' trabalhos em ') + rotuloDoNicho(nichoAtual) + '.';
   }
 
-  $$('#filtros .filtro').forEach(function(b){
-    b.addEventListener('click', function(){
-      $$('#filtros .filtro').forEach(function(o){ o.setAttribute('aria-pressed','false'); });
-      b.setAttribute('aria-pressed','true');
-      nichoAtual = b.dataset.nicho;
-      quantos = POR_PAGINA;
-      mostrarTrabalhos();
-    });
-  });
-
   btnMais.addEventListener('click', function(){
     quantos += POR_PAGINA;
     mostrarTrabalhos();
     if (btnMais.hidden){ aviso.focus && aviso.focus(); }
   });
-
-  mostrarTrabalhos();
 
   /* ---------- serviços ---------- */
   $('#gradeServicos').innerHTML = SERVICOS.map(function(s,i){
@@ -1224,13 +1265,80 @@ body.card-aberto{overflow:hidden}
   if (menosMovimento || !('IntersectionObserver' in window)){
     revelarTudo();
   } else {
-    const obs = new IntersectionObserver(function(entradas){
+    obsRevelar = new IntersectionObserver(function(entradas){
       entradas.forEach(function(e){
-        if (e.isIntersecting){ e.target.classList.add('visivel'); obs.unobserve(e.target); }
+        if (e.isIntersecting){ e.target.classList.add('visivel'); obsRevelar.unobserve(e.target); }
       });
     }, { threshold:.14, rootMargin:'0px 0px -60px 0px' });
-    $$('.revelar').forEach(function(e){ obs.observe(e); });
+    $$('.revelar').forEach(function(e){ obsRevelar.observe(e); });
   }
+
+  /* Agora que a animação está pronta, desenha a galeria com a
+     lista que está aqui no arquivo. É o que aparece na hora. */
+  montarGaleria(TRABALHOS);
+
+  /* =====================================================================
+     LIGAÇÃO COM O PAINEL (Supabase)
+     Tudo aqui é opcional: se o banco não responder, o site continua
+     igual, com a lista que já está neste arquivo.
+     ===================================================================== */
+  const banco = (window.conectarBanco ? window.conectarBanco() : null);
+
+  function idDoEndereco(endereco){
+    const m = String(endereco || '').match(/(?:shorts\/|watch\?v=|youtu\.be\/|embed\/)([A-Za-z0-9_-]{6,})/);
+    return m ? m[1] : '';
+  }
+
+  /* 1. os vídeos vêm do painel: o que você editar la muda aqui sozinho */
+  function buscarVideosDoPainel(){
+    if (!banco){ return; }
+    banco.from('videos').select('*').eq('visivel', true).order('ordem', { ascending:true })
+      .then(function(r){
+        if (r.error || !r.data || !r.data.length){ return; }
+        const lista = r.data.map(function(v){
+          return {
+            id: idDoEndereco(v.link),
+            link: v.link || '#',
+            marca: v.marca || 'sem marca',
+            nicho: (v.nicho || '').trim() || 'outros',
+            nota: v.titulo || v.formato || '',
+            destaque: v.destaque || ''
+          };
+        });
+        montarGaleria(lista);
+      }, function(){});
+  }
+  buscarVideosDoPainel();
+
+  /* 2. registro de visita: só a data, a página e de onde veio.
+        Sem cookie, sem serviço de fora, sem nada do visitante. */
+  function registrarVisita(){
+    if (!banco){ return; }
+    try{
+      if (sessionStorage.getItem('visita-registrada') === 'sim'){ return; }
+      sessionStorage.setItem('visita-registrada','sim');
+    }catch(e){}
+
+    let origem = 'direto';
+    try{
+      const campanha = new URLSearchParams(location.search).get('utm_source');
+      if (campanha){
+        origem = campanha;
+      } else if (document.referrer){
+        const casa = new URL(document.referrer).hostname.replace(/^www\./,'');
+        if (casa && casa !== location.hostname){ origem = casa; }
+      }
+    }catch(e){}
+
+    const agora = new Date();
+    const dia = agora.getFullYear() + '-' +
+      String(agora.getMonth()+1).padStart(2,'0') + '-' +
+      String(agora.getDate()).padStart(2,'0');
+
+    banco.from('visitas').insert({ data: dia, pagina: location.pathname, origem: origem })
+      .then(function(){}, function(){});
+  }
+  registrarVisita();
 
   /* ---------- contador animado ---------- */
   function anima(el){
@@ -1289,6 +1397,18 @@ body.card-aberto{overflow:hidden}
     const texto = 'Oi, Lara! Meu nome é ' + nome.value.trim() + '. ' + msg.value.trim() + ' (meu e-mail: ' + email.value.trim() + ')';
     $('#linkWhatsConfirma').href = CONTATO.whatsappLink + '?text=' + encodeURIComponent(texto);
     $('#tituloConfirma').textContent = 'Anotado na agenda, ' + nome.value.trim().split(' ')[0] + '!';
+
+    /* 3. o contato entra na base de marcas do painel, como Lead.
+          Se o banco falhar, a confirmação aparece do mesmo jeito:
+          o formulário nunca deixa a pessoa na mão. */
+    if (banco){
+      banco.from('marcas').insert({
+        nome: nome.value.trim(),
+        email: email.value.trim(),
+        situacao: 'lead',
+        obs: msg.value.trim()
+      }).then(function(){}, function(){});
+    }
 
     formContato.hidden = true;
     confirmacao.hidden = false;

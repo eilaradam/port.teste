@@ -1,0 +1,257 @@
+<!doctype html>
+<html lang="pt-BR">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="robots" content="noindex, nofollow">
+<title>Entrar · Lara Damasceno</title>
+<meta name="description" content="Área restrita.">
+<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Crect width='32' height='32' rx='7' fill='%23f7f3e8'/%3E%3Crect x='5' y='8' width='22' height='2' fill='%23c8991f'/%3E%3Crect x='5' y='15' width='22' height='2' fill='%23c8991f'/%3E%3Crect x='5' y='22' width='13' height='2' fill='%23c74b34'/%3E%3C/svg%3E">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Mulish:wght@400;600;700;800&display=swap" rel="stylesheet">
+<style>
+:root{
+  --creme:#f7f3e8;
+  --papel:#ffffff;
+  --amarelo:#d4a017;
+  --amarelo-escuro:#8a6a12;
+  --tomate:#c74b34;
+  --tinta:#2b2822;
+  --tinta-suave:#5b5649;
+  --borda:rgba(43,40,34,.14);
+  --raio:12px;
+}
+*,*::before,*::after{box-sizing:border-box}
+body{
+  margin:0;min-height:100vh;
+  display:flex;align-items:center;justify-content:center;padding:24px;
+  font-family:'Mulish',system-ui,sans-serif;font-size:15px;line-height:1.6;color:var(--tinta);
+  background-color:var(--creme);
+  background-image:repeating-linear-gradient(to bottom,
+    transparent 0, transparent 33px, rgba(154,122,18,.17) 33px, rgba(154,122,18,.17) 34px);
+}
+:focus-visible{outline:3px solid var(--tomate);outline-offset:3px;border-radius:5px}
+.cartao{
+  width:100%;max-width:370px;background:var(--papel);
+  border:1px solid var(--borda);border-left:6px solid var(--amarelo);
+  border-radius:var(--raio);padding:30px 26px;
+  box-shadow:0 12px 34px rgba(43,40,34,.09);
+}
+.marca{font-size:1.05rem;font-weight:800;margin:0;letter-spacing:-.01em}
+.marca span{
+  display:block;font-size:.62rem;font-weight:800;letter-spacing:.2em;
+  text-transform:uppercase;color:var(--amarelo-escuro);margin-top:3px;
+}
+h1{font-size:1.15rem;font-weight:800;margin:22px 0 4px}
+.ajuda{margin:0 0 20px;font-size:.88rem;color:var(--tinta-suave)}
+label{display:block;font-size:.72rem;font-weight:800;letter-spacing:.1em;text-transform:uppercase;margin-bottom:6px}
+input{
+  width:100%;font:inherit;font-size:.95rem;color:var(--tinta);
+  background:var(--creme);border:1px solid var(--borda);border-radius:9px;
+  padding:11px 13px;margin-bottom:14px;
+}
+input:focus{background:#fff;border-color:var(--amarelo-escuro);outline:none;box-shadow:0 0 0 3px rgba(212,160,23,.28)}
+button{
+  width:100%;font:inherit;font-weight:800;font-size:.9rem;letter-spacing:.04em;
+  padding:12px 18px;border-radius:999px;border:0;cursor:pointer;
+  background:var(--tomate);color:#fff;transition:background .2s ease;
+}
+button:hover:not(:disabled){background:#b24029}
+button:disabled{opacity:.6;cursor:progress}
+.link{
+  display:block;width:100%;background:none;border:0;color:var(--tinta-suave);
+  font:inherit;font-size:.84rem;text-align:center;margin-top:14px;cursor:pointer;
+  text-decoration:underline;padding:4px;
+}
+.link:hover{color:var(--amarelo-escuro);background:none}
+.faixa{
+  border-radius:9px;padding:11px 13px;margin-bottom:16px;font-size:.87rem;font-weight:600;
+}
+.faixa.erro{background:rgba(199,75,52,.1);border:1px solid rgba(199,75,52,.35);color:#8f2f1c}
+.faixa.ok{background:rgba(212,160,23,.16);border:1px solid rgba(212,160,23,.45);color:var(--amarelo-escuro)}
+.faixa[hidden]{display:none !important}
+[hidden]{display:none !important}
+.rodape{margin-top:22px;border-top:1px dashed var(--borda);padding-top:14px;text-align:center}
+.rodape a{font-size:.8rem;color:var(--tinta-suave)}
+</style>
+</head>
+<body>
+
+<main class="cartao">
+  <p class="marca">Lara Damasceno<span>painel</span></p>
+
+  <!-- faixa de aviso: erro em vermelho, confirmação em amarelo -->
+  <div class="faixa erro" id="faixaErro" role="alert" hidden></div>
+  <div class="faixa ok" id="faixaOk" role="status" hidden></div>
+
+  <!-- ENTRAR -->
+  <section id="blocoEntrar">
+    <h1>Entrar</h1>
+    <p class="ajuda">Área restrita. Use o seu e-mail e a sua senha.</p>
+    <form id="formEntrar" novalidate>
+      <label for="email">e-mail</label>
+      <input type="email" id="email" autocomplete="username" required>
+      <label for="senha">senha</label>
+      <input type="password" id="senha" autocomplete="current-password" required>
+      <button type="submit" id="botaoEntrar">Entrar</button>
+    </form>
+    <button class="link" type="button" id="botaoEsqueci">esqueci minha senha</button>
+  </section>
+
+  <!-- NOVA SENHA: só aparece quando você chega pelo link do e-mail -->
+  <section id="blocoNovaSenha" hidden>
+    <h1>Criar uma senha nova</h1>
+    <p class="ajuda">Escolha a nova senha, com pelo menos 8 caracteres.</p>
+    <form id="formNovaSenha" novalidate>
+      <label for="novaSenha">nova senha</label>
+      <input type="password" id="novaSenha" autocomplete="new-password" required>
+      <button type="submit" id="botaoSalvarSenha">Salvar a nova senha</button>
+    </form>
+  </section>
+
+  <div class="rodape">
+    <a href="../">voltar para o portfólio</a>
+  </div>
+</main>
+
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+<script src="../js/banco.js"></script>
+<script>
+(function(){
+  'use strict';
+
+  const $ = function(s){ return document.querySelector(s); };
+  const faixaErro = $('#faixaErro');
+  const faixaOk   = $('#faixaOk');
+
+  function erro(texto){ faixaOk.hidden = true; faixaErro.textContent = texto; faixaErro.hidden = false; }
+  function ok(texto){ faixaErro.hidden = true; faixaOk.textContent = texto; faixaOk.hidden = false; }
+  function limpar(){ faixaErro.hidden = true; faixaOk.hidden = true; }
+
+  /* Traduz o recado do Supabase, que vem em inglês, para português.
+     O que não estiver na lista vira um recado genérico, nunca inglês. */
+  function emPortugues(mensagem){
+    const m = String(mensagem || '').toLowerCase();
+    if (m.indexOf('invalid login') >= 0 || m.indexOf('invalid credentials') >= 0){
+      return 'E-mail ou senha incorretos';
+    }
+    if (m.indexOf('email not confirmed') >= 0){
+      return 'Esse e-mail ainda não foi confirmado. Procure o e-mail de confirmação na sua caixa de entrada.';
+    }
+    if (m.indexOf('rate limit') >= 0 || m.indexOf('too many') >= 0){
+      return 'Muitas tentativas seguidas. Espere um minutinho e tente de novo.';
+    }
+    if (m.indexOf('password should be') >= 0 || m.indexOf('at least') >= 0){
+      return 'A senha precisa ter pelo menos 8 caracteres.';
+    }
+    if (m.indexOf('fetch') >= 0 || m.indexOf('network') >= 0 || m.indexOf('failed to') >= 0){
+      return 'Não consegui falar com o servidor. Confira a sua internet e tente de novo.';
+    }
+    return 'Não consegui entrar agora. Tente de novo em instantes.';
+  }
+
+  const sb = window.conectarBanco();
+  if (!sb){
+    erro('A biblioteca de acesso não carregou. Recarregue a página, por favor.');
+    return;
+  }
+
+  /* Se a pessoa chegou pelo link de recuperação, o endereço traz
+     type=recovery. Nesse caso não mandamos para o admin: mostramos
+     o campo de senha nova. */
+  const veioDoLinkDeSenha = location.hash.indexOf('type=recovery') >= 0;
+
+  function mostrarNovaSenha(){
+    $('#blocoEntrar').hidden = true;
+    $('#blocoNovaSenha').hidden = false;
+    $('#novaSenha').focus();
+  }
+
+  sb.auth.onAuthStateChange(function(evento){
+    if (evento === 'PASSWORD_RECOVERY'){ limpar(); mostrarNovaSenha(); }
+  });
+
+  /* Já tem sessão aberta? Vai direto para o admin. */
+  if (!veioDoLinkDeSenha){
+    sb.auth.getSession().then(function(resposta){
+      if (resposta && resposta.data && resposta.data.session){
+        location.replace('../admin/');
+      }
+    }).catch(function(){ /* sem sessão, segue na tela de entrar */ });
+  } else {
+    mostrarNovaSenha();
+  }
+
+  /* ---------- entrar ---------- */
+  $('#formEntrar').addEventListener('submit', function(ev){
+    ev.preventDefault();
+    limpar();
+    const email = $('#email').value.trim();
+    const senha = $('#senha').value;
+    if (!email || !senha){ erro('Preencha o e-mail e a senha.'); return; }
+
+    const botao = $('#botaoEntrar');
+    botao.disabled = true;
+    botao.textContent = 'Entrando...';
+
+    sb.auth.signInWithPassword({ email: email, password: senha }).then(function(r){
+      if (r.error){
+        erro(emPortugues(r.error.message));
+        botao.disabled = false;
+        botao.textContent = 'Entrar';
+        return;
+      }
+      location.replace('../admin/');
+    }).catch(function(e){
+      erro(emPortugues(e && e.message));
+      botao.disabled = false;
+      botao.textContent = 'Entrar';
+    });
+  });
+
+  /* ---------- esqueci minha senha ---------- */
+  $('#botaoEsqueci').addEventListener('click', function(){
+    limpar();
+    const email = $('#email').value.trim();
+    if (!email){
+      erro('Escreva o seu e-mail no campo acima e clique aqui de novo.');
+      $('#email').focus();
+      return;
+    }
+    const voltarPara = location.origin + location.pathname;
+    sb.auth.resetPasswordForEmail(email, { redirectTo: voltarPara }).then(function(r){
+      if (r.error){ erro(emPortugues(r.error.message)); return; }
+      ok('Pronto. Se esse e-mail existir por aqui, o link de recuperação já está a caminho da sua caixa de entrada.');
+    }).catch(function(e){ erro(emPortugues(e && e.message)); });
+  });
+
+  /* ---------- salvar a senha nova ---------- */
+  $('#formNovaSenha').addEventListener('submit', function(ev){
+    ev.preventDefault();
+    limpar();
+    const nova = $('#novaSenha').value;
+    if (nova.length < 8){ erro('A senha precisa ter pelo menos 8 caracteres.'); return; }
+
+    const botao = $('#botaoSalvarSenha');
+    botao.disabled = true;
+    botao.textContent = 'Salvando...';
+
+    sb.auth.updateUser({ password: nova }).then(function(r){
+      if (r.error){
+        erro(emPortugues(r.error.message));
+        botao.disabled = false;
+        botao.textContent = 'Salvar a nova senha';
+        return;
+      }
+      location.replace('../admin/');
+    }).catch(function(e){
+      erro(emPortugues(e && e.message));
+      botao.disabled = false;
+      botao.textContent = 'Salvar a nova senha';
+    });
+  });
+})();
+</script>
+</body>
+</html>
