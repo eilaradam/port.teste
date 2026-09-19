@@ -354,7 +354,13 @@ textarea.roteiro:focus{outline:none;background:#fff;border-color:var(--amarelo);
 .p-instagram{background:rgba(63,107,122,.17);color:#2f5462}
 .p-tiktok{background:rgba(43,40,34,.12);color:#3d3930}
 .p-outro{background:rgba(138,133,122,.2);color:#6a6559}
-.tr-detalhe{display:grid;grid-template-columns:340px 1fr;gap:18px;align-items:start}
+.tr-detalhe{display:grid;grid-template-columns:360px 1fr;gap:18px;align-items:start}
+.tr-abas{display:flex;gap:6px;margin-bottom:10px}
+.tr-dica{
+  font-size:.79rem;color:var(--tinta-suave);background:var(--creme);
+  border-left:3px solid var(--amarelo);border-radius:0 8px 8px 0;padding:9px 11px;margin-bottom:10px;
+}
+.salvo-em{font-size:.76rem;color:var(--apagado);align-self:center}
 .tr-video{position:relative;background:#000;border-radius:var(--raio);overflow:hidden}
 .tr-video.vertical{aspect-ratio:9/16}
 .tr-video.alto{height:620px}
@@ -374,8 +380,9 @@ textarea.transcricao:focus{outline:none;background:#fff;border-color:var(--amare
   padding:8px 0;border-bottom:1px solid var(--borda-leve);color:var(--tinta-suave);
 }
 .passo:last-child{border-bottom:0}
-.passo b{flex:0 0 20px;height:20px;border-radius:50%;background:rgba(212,160,23,.2);
-  color:var(--amarelo-escuro);display:grid;place-items:center;font-size:.7rem}
+.passo .n{flex:0 0 20px;height:20px;border-radius:50%;background:rgba(212,160,23,.2);
+  color:var(--amarelo-escuro);display:grid;place-items:center;font-size:.7rem;font-weight:800}
+.passo b{font-weight:800;color:var(--tinta)}
 @media(max-width:900px){ .tr-detalhe{grid-template-columns:1fr} .tr-video.alto{height:520px} }
 
 /* ---------- janelas ---------- */
@@ -1759,6 +1766,7 @@ textarea.transcricao:focus{outline:none;background:#fff;border-color:var(--amare
   let telaTranscricao = 'lista';
   let transcricaoAberta = null;
   let buscaTranscricao = '';
+  let ladoEsquerdo = 'video';
 
   function plataformaDoLink(link){
     const l = String(link || '').toLowerCase();
@@ -1786,6 +1794,19 @@ textarea.transcricao:focus{outline:none;background:#fff;border-color:var(--amare
       return { url:'https://www.instagram.com/' + tipo + '/' + m[2] + '/embed', alto:true };
     }
     return null;
+  }
+
+  /* copiar sem deixar promessa solta: o navegador recusa quando a
+     janela não está em foco, e isso não pode virar erro na tela */
+  function copiarParaAreaDeTransferencia(texto, avisar){
+    try{
+      navigator.clipboard.writeText(texto).then(
+        function(){ if (avisar){ avisinho('Link copiado.'); } },
+        function(){ if (avisar){ avisinho('Não consegui copiar. Selecione o link no campo e use Cmd+C.'); } }
+      );
+    }catch(e){
+      if (avisar){ avisinho('Não consegui copiar. Selecione o link no campo e use Cmd+C.'); }
+    }
   }
 
   function capaDaTranscricao(link){
@@ -1816,9 +1837,9 @@ textarea.transcricao:focus{outline:none;background:#fff;border-color:var(--amare
         '<button class="botao" type="button" id="guardarLink">guardar</button>' +
       '</div>' +
       '<div style="margin-top:12px">' +
-        '<div class="passo"><b>1</b><span>Cole o link aqui em cima e clique em guardar. O vídeo já aparece para você assistir.</span></div>' +
-        '<div class="passo"><b>2</b><span>Dentro do conteúdo, clique em "pegar o roteiro no TokScript". Ele abre em outra aba com o link junto.</span></div>' +
-        '<div class="passo"><b>3</b><span>Copie a transcrição de lá, cole no campo do roteiro, escreva as suas observações e salve.</span></div>' +
+        '<div class="passo"><span class="n">1</span><span>Cole o link aqui em cima e clique em guardar. O vídeo já aparece para você assistir.</span></div>' +
+        '<div class="passo"><span class="n">2</span><span>Dentro do conteúdo, clique em "pegar o roteiro no TokScript". Ele abre em outra aba com o link junto.</span></div>' +
+        '<div class="passo"><span class="n">3</span><span>Copie a transcrição de lá, cole no campo do roteiro, escreva as suas observações e salve.</span></div>' +
       '</div></div>';
 
     html += '<div class="barra-ferramentas">' +
@@ -1900,16 +1921,13 @@ textarea.transcricao:focus{outline:none;background:#fff;border-color:var(--amare
 
     let html = '<div class="tr-detalhe">' +
       '<div>' +
-        (ver
-          ? '<div class="tr-video ' + (ver.alto ? 'alto' : 'vertical') + '">' +
-              '<iframe src="' + escapar(ver.url) + '" title="Conteúdo guardado" loading="lazy" ' +
-              'allow="accelerometer; clipboard-write; encrypted-media; gyroscope; picture-in-picture" allowfullscreen></iframe>' +
-            '</div>'
-          : '<div class="tr-sem-preview">Não consegui montar a janelinha do vídeo para este link. ' +
-            'Use o botão abaixo para abrir no site de origem.</div>') +
+        '<div class="tr-abas">' +
+          '<button class="chip" type="button" data-lado="video" aria-pressed="' + (ladoEsquerdo==='video') + '">o vídeo</button>' +
+          '<button class="chip" type="button" data-lado="transcrever" aria-pressed="' + (ladoEsquerdo==='transcrever') + '">transcrever</button>' +
+        '</div>' +
+        '<div id="ladoEsquerdo"></div>' +
         '<div style="display:flex;gap:8px;flex-wrap:wrap;margin-top:10px">' +
           '<a class="botao claro" href="' + escapar(t.link) + '" target="_blank" rel="noopener" style="text-decoration:none">abrir o original</a>' +
-          '<button class="botao" type="button" id="irTokScript">pegar o roteiro no TokScript</button>' +
         '</div>' +
       '</div>' +
       '<div>' +
@@ -1923,12 +1941,18 @@ textarea.transcricao:focus{outline:none;background:#fff;border-color:var(--amare
         '</div>' +
         campoTexto('trTitulo','título (como você quer lembrar dele)', t.titulo) +
         campoTexto('trLink','link', t.link, 'url') +
-        '<div class="campo"><label for="trTranscricao">roteiro (a transcrição)</label>' +
-          '<textarea class="transcricao" id="trTranscricao" placeholder="Cole aqui o roteiro que você copiou do TokScript.">' + escapar(t.transcricao || '') + '</textarea></div>' +
+        '<div class="campo">' +
+          '<div style="display:flex;align-items:center;gap:8px;margin-bottom:5px">' +
+            '<label for="trTranscricao" style="margin:0">roteiro (a transcrição)</label>' +
+            '<span style="flex:1"></span>' +
+            '<button class="botao claro" type="button" id="colarRoteiro" style="padding:4px 12px;font-size:.76rem">colar</button>' +
+          '</div>' +
+          '<textarea class="transcricao" id="trTranscricao" placeholder="Copie o roteiro no quadro da esquerda e clique em colar, ou use Cmd+V aqui.">' + escapar(t.transcricao || '') + '</textarea></div>' +
         '<div class="campo"><label for="trObs">as minhas observações</label>' +
           '<textarea id="trObs" style="min-height:110px" placeholder="O que funcionou aqui? O gancho, o corte, a fala? O que dá para adaptar para a sua marca?">' + escapar(t.obs || '') + '</textarea></div>' +
         '<div class="janela-pe" style="justify-content:flex-start">' +
           '<button class="botao" type="button" id="salvarTr">salvar</button>' +
+          '<span class="salvo-em" id="salvoEm"></span>' +
         '</div>' +
       '</div>' +
     '</div>';
@@ -1941,16 +1965,84 @@ textarea.transcricao:focus{outline:none;background:#fff;border-color:var(--amare
       desenharTranscricoes();
     });
 
-    $('#irTokScript').addEventListener('click', function(){
-      const endereco = plat === 'instagram'
-        ? TOKSCRIPT + '/instagram-transcript-generator'
-        : TOKSCRIPT;
-      /* o link vai junto na hora de abrir; se o site não usar, é só
-         colar lá do mesmo jeito, o endereço já está copiado abaixo */
-      window.open(endereco + '?url=' + encodeURIComponent(t.link), '_blank', 'noopener');
-      try{ navigator.clipboard.writeText(t.link); avisinho('TokScript aberto, e o link já está copiado para colar lá.'); }
-      catch(e){ avisinho('TokScript aberto numa aba nova.'); }
+    /* desenha a coluna da esquerda: ou o vídeo, ou o TokScript.
+       O quadro do TokScript só é criado quando ela pede, para a
+       página não ficar pesada à toa. O sandbox deixa o site deles
+       funcionar mas proíbe que ele tire você do painel. */
+    function desenharLadoEsquerdo(){
+      const caixa = $('#ladoEsquerdo');
+      if (ladoEsquerdo === 'transcrever'){
+        /* Tentei encaixar o TokScript aqui dentro numa moldura e não
+           funciona: o site deles não roda dentro de moldura, a área
+           fica em branco. Então a janelinha flutuante é o mais perto
+           que dá de não te tirar do painel: o admin fica aberto atrás,
+           sem perder nada do que você escreveu. */
+        caixa.innerHTML =
+          '<p class="tr-dica">O TokScript abre numa janelinha por cima, e o painel fica aqui atrás, ' +
+          'do jeitinho que você deixou. Copie o roteiro lá e volte.</p>' +
+          '<div class="passo"><span class="n">1</span><span>Clique no botão abaixo. O link já vai copiado.</span></div>' +
+          '<div class="passo"><span class="n">2</span><span>Cole no campo do TokScript e espere o roteiro.</span></div>' +
+          '<div class="passo"><span class="n">3</span><span>Copie o roteiro, feche a janelinha e clique em <b>colar</b>, no campo do lado.</span></div>' +
+          '<button class="botao" type="button" id="abrirJanelinha" style="width:100%;margin-top:12px">' +
+          'abrir o TokScript numa janelinha</button>' +
+          '<button class="botao claro" type="button" id="copiarLink" style="width:100%;margin-top:8px">' +
+          'copiar só o link do vídeo</button>';
+
+        $('#abrirJanelinha').addEventListener('click', function(){
+          const endereco = (plat === 'instagram'
+            ? TOKSCRIPT + '/instagram-transcript-generator'
+            : TOKSCRIPT) + '?url=' + encodeURIComponent(t.link);
+          copiarParaAreaDeTransferencia(t.link);
+          window.open(endereco, 'tokscript', 'width=540,height=800,noopener');
+        });
+        $('#copiarLink').addEventListener('click', function(){
+          copiarParaAreaDeTransferencia(t.link, true);
+        });
+      } else {
+        caixa.innerHTML = ver
+          ? '<div class="tr-video ' + (ver.alto ? 'alto' : 'vertical') + '">' +
+              '<iframe src="' + escapar(ver.url) + '" title="Conteúdo guardado" loading="lazy" ' +
+              'allow="accelerometer; clipboard-write; encrypted-media; gyroscope; picture-in-picture" allowfullscreen></iframe>' +
+            '</div>'
+          : '<div class="tr-sem-preview">Não consegui montar a janelinha do vídeo para este link. ' +
+            'Use o botão abaixo para abrir no site de origem.</div>';
+      }
+    }
+    desenharLadoEsquerdo();
+
+    $$('[data-lado]').forEach(function(b){
+      b.addEventListener('click', function(){
+        ladoEsquerdo = b.dataset.lado;
+        $$('[data-lado]').forEach(function(o){ o.setAttribute('aria-pressed', String(o.dataset.lado === ladoEsquerdo)); });
+        desenharLadoEsquerdo();
+      });
     });
+
+    /* botão colar: lê o que está na área de transferência e joga no campo */
+    $('#colarRoteiro').addEventListener('click', async function(){
+      const campo = $('#trTranscricao');
+      try{
+        const texto = await navigator.clipboard.readText();
+        if (!texto){ avisinho('Não tem nada copiado ainda.'); return; }
+        campo.value = texto;
+        campo.dispatchEvent(new Event('input'));
+        avisinho('Roteiro colado.');
+      }catch(e){
+        campo.focus();
+        avisinho('O navegador pediu permissão. Se preferir, clique no campo e aperte Cmd+V.');
+      }
+    });
+
+    /* salva sozinho enquanto ela escreve, para não perder trabalho */
+    let relogioSalvar = null;
+    function salvarSozinho(){
+      clearTimeout(relogioSalvar);
+      $('#salvoEm').textContent = 'escrevendo...';
+      relogioSalvar = setTimeout(function(){ salvarTranscricao(true); }, 1400);
+    }
+    $('#trTranscricao').addEventListener('input', salvarSozinho);
+    $('#trObs').addEventListener('input', salvarSozinho);
+    $('#trTitulo').addEventListener('input', salvarSozinho);
 
     $('#favoritarTr').addEventListener('click', async function(){
       const novo = !t.favorita;
@@ -1970,7 +2062,7 @@ textarea.transcricao:focus{outline:none;background:#fff;border-color:var(--amare
       });
     });
 
-    $('#salvarTr').addEventListener('click', async function(){
+    async function salvarTranscricao(silencioso){
       const registro = {
         id: t.id,
         titulo: $('#trTitulo').value.trim(),
@@ -1980,11 +2072,15 @@ textarea.transcricao:focus{outline:none;background:#fff;border-color:var(--amare
         obs: $('#trObs').value
       };
       const r = await gravar('transcricoes', registro);
-      if (!r.ok){ return; }
+      if (!r.ok){ $('#salvoEm').textContent = 'não consegui salvar'; return; }
       Object.assign(t, registro);
-      avisinho('Salvo.');
-      desenharTranscricoes();
-    });
+      const agora = new Date();
+      $('#salvoEm').textContent = 'salvo às ' +
+        String(agora.getHours()).padStart(2,'0') + ':' + String(agora.getMinutes()).padStart(2,'0');
+      if (!silencioso){ avisinho('Salvo.'); desenharTranscricoes(); }
+    }
+
+    $('#salvarTr').addEventListener('click', function(){ salvarTranscricao(false); });
   }
 
   /* =====================================================================
