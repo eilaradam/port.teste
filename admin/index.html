@@ -543,32 +543,61 @@ textarea.roteiro:focus{outline:none;background:#fff;border-color:var(--amarelo);
     const codigo = (e && e.code) || '';
     if (m.indexOf('does not exist') >= 0 || m.indexOf('schema cache') >= 0 ||
         codigo === '42P01' || codigo === 'PGRST205' || codigo === 'PGRST202'){
-      return 'A tabela "' + tabela + '" ainda não existe no banco. Rode o arquivo banco.sql no Supabase para criar.';
+      return { tipo:'falta-tabela', tabela: tabela, texto: 'A tabela "' + tabela + '" ainda não existe no banco.' };
     }
     if (m.indexOf('column') >= 0 || codigo === '42703' || codigo === 'PGRST204'){
-      return 'Faltou um campo na tabela "' + tabela + '". Rode o banco.sql de novo no Supabase.';
+      return { tipo:'outro', texto:'Faltou um campo na tabela "' + tabela + '". Rode o banco.sql de novo no Supabase.' };
     }
     if (m.indexOf('permission') >= 0 || m.indexOf('row-level') >= 0 || m.indexOf('policy') >= 0 || codigo === '42501'){
-      return 'O banco não deixou usar a tabela "' + tabela + '". Confira se você entrou com o e-mail ' + window.BANCO.dona + '.';
+      return { tipo:'outro', texto:'O banco não deixou usar a tabela "' + tabela + '". Confira se você entrou com o e-mail ' + window.BANCO.dona + '.' };
     }
     if (m.indexOf('fetch') >= 0 || m.indexOf('network') >= 0){
-      return 'Não consegui falar com o banco agora. Confira a sua internet.';
+      return { tipo:'outro', texto:'Não consegui falar com o banco agora. Confira a sua internet.' };
     }
-    return 'Não consegui carregar a tabela "' + tabela + '" agora.';
+    return { tipo:'outro', texto:'Não consegui carregar a tabela "' + tabela + '" agora.' };
   }
 
-  function registrarAviso(texto){
-    if (avisos.indexOf(texto) < 0){ avisos.push(texto); }
+  function registrarAviso(aviso){
+    const jaTem = avisos.some(function(a){ return a.texto === aviso.texto; });
+    if (!jaTem){ avisos.push(aviso); }
   }
 
+  /* O aviso de tabela faltando vira um recado só, com o passo a passo,
+     em vez de seis linhas repetindo a mesma coisa. */
   function mostrarAvisos(){
     const caixa = $('#avisos');
     if (!avisos.length){ caixa.hidden = true; return; }
     caixa.hidden = false;
-    caixa.innerHTML = '<b>O painel abriu, mas faltou alguma coisa no banco:</b><ul>' +
-      avisos.map(function(a){ return '<li>' + escapar(a) + '</li>'; }).join('') +
-      '</ul><p style="margin-top:8px;font-size:.8rem;color:var(--tinta-suave)">' +
-      'O resto do painel continua funcionando normalmente.</p>';
+
+    const faltando = avisos.filter(function(a){ return a.tipo === 'falta-tabela'; })
+                           .map(function(a){ return a.tabela; });
+    const outros = avisos.filter(function(a){ return a.tipo !== 'falta-tabela'; });
+
+    let html = '';
+    if (faltando.length){
+      const painelSQL = 'https://supabase.com/dashboard/project/' +
+        String(window.BANCO.url).replace('https://','').split('.')[0] + '/sql/new';
+      html +=
+        '<b>Falta um passo: criar as tabelas no banco</b>' +
+        '<p style="font-size:.85rem;margin-bottom:8px">É rápido e você faz uma vez só. ' +
+        'Enquanto isso o painel funciona, só fica sem os seus dados.</p>' +
+        '<ol style="font-size:.85rem;padding-left:18px;list-style:decimal">' +
+          '<li style="margin-bottom:4px">Abra o arquivo <b>banco.sql</b>, que está na pasta do seu projeto, e copie tudo (Cmd+A e depois Cmd+C).</li>' +
+          '<li style="margin-bottom:4px">Clique no botão abaixo para abrir o editor de SQL do Supabase já na página certa.</li>' +
+          '<li style="margin-bottom:4px">Cole lá dentro e clique em <b>Run</b>. Deve aparecer uma tabelinha com seis linhas e a coluna rls_ligado toda em true.</li>' +
+          '<li>Volte aqui e recarregue esta página.</li>' +
+        '</ol>' +
+        '<p style="margin:10px 0 0"><a class="botao" href="' + painelSQL + '" target="_blank" rel="noopener" ' +
+        'style="display:inline-block;text-decoration:none">abrir o editor de SQL do Supabase</a></p>' +
+        '<p style="margin-top:10px;font-size:.78rem;color:var(--tinta-suave)">' +
+        'Faltando agora: ' + escapar(faltando.sort().join(', ')) + '.</p>';
+    }
+    if (outros.length){
+      html += (faltando.length ? '<hr style="border:0;border-top:1px solid var(--borda);margin:12px 0">' : '') +
+        '<b>Outras coisas que eu não consegui fazer:</b><ul>' +
+        outros.map(function(a){ return '<li>' + escapar(a.texto) + '</li>'; }).join('') + '</ul>';
+    }
+    caixa.innerHTML = html;
   }
 
   async function ler(tabela, coluna, crescente){
@@ -597,7 +626,7 @@ textarea.roteiro:focus{outline:none;background:#fff;border-color:var(--amarelo);
       if (r.error){ throw r.error; }
       return { ok:true, linha: (r.data && r.data[0]) || null };
     }catch(e){
-      avisinho('Não deu para salvar. ' + explicarErro(tabela, e));
+      avisinho('Não deu para salvar. ' + explicarErro(tabela, e).texto);
       return { ok:false };
     }
   }
@@ -608,7 +637,7 @@ textarea.roteiro:focus{outline:none;background:#fff;border-color:var(--amarelo);
       if (r.error){ throw r.error; }
       return true;
     }catch(e){
-      avisinho('Não deu para apagar. ' + explicarErro(tabela, e));
+      avisinho('Não deu para apagar. ' + explicarErro(tabela, e).texto);
       return false;
     }
   }
@@ -631,7 +660,7 @@ textarea.roteiro:focus{outline:none;background:#fff;border-color:var(--amarelo);
     resultado[5].forEach(function(m){ if (m && m.marcado){ dados.marcados[m.chave] = true; } });
 
     if (!window.Biblioteca){
-      registrarAviso('O arquivo js/biblioteca.js não carregou, então a aba Checklist vai aparecer vazia.');
+      registrarAviso({ tipo:'outro', texto:'O arquivo js/biblioteca.js não carregou, então a aba Checklist vai aparecer vazia.' });
     }
   }
 
