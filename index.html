@@ -1310,35 +1310,76 @@ body.card-aberto{overflow:hidden}
   }
   buscarVideosDoPainel();
 
-  /* 2. registro de visita: só a data, a página e de onde veio.
-        Sem cookie, sem serviço de fora, sem nada do visitante. */
-  function registrarVisita(){
-    if (!banco){ return; }
-    try{
-      if (sessionStorage.getItem('visita-registrada') === 'sim'){ return; }
-      sessionStorage.setItem('visita-registrada','sim');
-    }catch(e){}
-
-    let origem = 'direto';
+  /* 2. registro de visita e dos cliques que viram número no painel.
+        Só a data, a página e de onde veio. Sem cookie, sem serviço
+        de fora, sem nada que identifique quem está do outro lado. */
+  function origemDaVisita(){
     try{
       const campanha = new URLSearchParams(location.search).get('utm_source');
-      if (campanha){
-        origem = campanha;
-      } else if (document.referrer){
+      if (campanha){ return campanha; }
+      if (document.referrer){
         const casa = new URL(document.referrer).hostname.replace(/^www\./,'');
-        if (casa && casa !== location.hostname){ origem = casa; }
+        if (casa && casa !== location.hostname){ return casa; }
       }
     }catch(e){}
+    return 'direto';
+  }
 
+  function diaDeHoje(){
     const agora = new Date();
-    const dia = agora.getFullYear() + '-' +
+    return agora.getFullYear() + '-' +
       String(agora.getMonth()+1).padStart(2,'0') + '-' +
       String(agora.getDate()).padStart(2,'0');
+  }
 
-    banco.from('visitas').insert({ data: dia, pagina: location.pathname, origem: origem })
+  /* anota uma linha na tabela visitas.
+     Quando "oQue" começa com barra, é uma visita de página.
+     Quando começa com outra coisa, é um clique, e o painel
+     separa os dois na hora de contar. */
+  function anotar(oQue){
+    if (!banco){ return; }
+    banco.from('visitas')
+      .insert({ data: diaDeHoje(), pagina: oQue, origem: origemDaVisita() })
       .then(function(){}, function(){});
   }
+
+  /* A visita só é marcada como registrada DEPOIS que o banco
+     confirma. Se der erro, a próxima abertura tenta de novo,
+     em vez de perder a visita para sempre. */
+  function registrarVisita(){
+    if (!banco){ return; }
+    let jaRegistrou = false;
+    try{ jaRegistrou = sessionStorage.getItem('visita-registrada') === 'sim'; }catch(e){}
+    if (jaRegistrou){ return; }
+
+    banco.from('visitas')
+      .insert({ data: diaDeHoje(), pagina: location.pathname, origem: origemDaVisita() })
+      .then(function(r){
+        if (r && r.error){ return; }
+        try{ sessionStorage.setItem('visita-registrada','sim'); }catch(e){}
+      }, function(){});
+  }
   registrarVisita();
+
+  /* quantas pessoas rolaram até o formulário, uma vez por visita */
+  function olharSecaoDeContato(){
+    const alvo = $('#contato');
+    if (!banco || !alvo || !('IntersectionObserver' in window)){ return; }
+    let jaViu = false;
+    try{ jaViu = sessionStorage.getItem('viu-contato') === 'sim'; }catch(e){}
+    if (jaViu){ return; }
+
+    const olho = new IntersectionObserver(function(entradas){
+      entradas.forEach(function(e){
+        if (!e.isIntersecting){ return; }
+        olho.disconnect();
+        try{ sessionStorage.setItem('viu-contato','sim'); }catch(err){}
+        anotar('secao: contato');
+      });
+    }, { threshold:.25 });
+    olho.observe(alvo);
+  }
+  olharSecaoDeContato();
 
   /* ---------- contador animado ---------- */
   function anima(el){
@@ -1408,6 +1449,7 @@ body.card-aberto{overflow:hidden}
         situacao: 'lead',
         obs: msg.value.trim()
       }).then(function(){}, function(){});
+      anotar('formulario enviado');
     }
 
     formContato.hidden = true;
@@ -1433,6 +1475,7 @@ body.card-aberto{overflow:hidden}
     $('#linkYoutube').href = linkDoVideo(id);
     /* vq=hd1080 pede a melhor qualidade; o YouTube ainda decide pelo
        tamanho do player e pela conexão de quem está assistindo */
+    anotar('video: ' + titulo);
     quadro.innerHTML = '<iframe src="https://www.youtube-nocookie.com/embed/' + id +
       '?autoplay=1&rel=0&playsinline=1&modestbranding=1&vq=hd1080" ' +
       'title="Vídeo que fiz para ' + titulo + '" ' +

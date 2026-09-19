@@ -775,6 +775,16 @@ textarea.roteiro:focus{outline:none;background:#fff;border-color:var(--amarelo);
     const h = hoje();
     const inicio = new Date(h); inicio.setDate(h.getDate() - 13);
 
+    /* A tabela visitas guarda duas coisas: a visita da página, que
+       começa com barra, e os cliques, que começam com uma palavra.
+       Aqui eu separo as duas antes de contar qualquer número. */
+    const paginas = dados.visitas.filter(function(v){
+      return String(v.pagina || '').charAt(0) === '/';
+    });
+    const eventos = dados.visitas.filter(function(v){
+      return String(v.pagina || '').charAt(0) !== '/';
+    });
+
     const porDia = {};
     for (let i = 0; i < 14; i++){
       const d = new Date(inicio); d.setDate(inicio.getDate() + i);
@@ -782,7 +792,7 @@ textarea.roteiro:focus{outline:none;background:#fff;border-color:var(--amarelo);
     }
     let em14 = 0, hojeConta = 0;
     const origens = {};
-    dados.visitas.forEach(function(v){
+    paginas.forEach(function(v){
       const chave = String(v.data || '').slice(0,10);
       if (porDia[chave] !== undefined){ porDia[chave]++; em14++; }
       if (chave === iso(h)){ hojeConta++; }
@@ -839,6 +849,52 @@ textarea.roteiro:focus{outline:none;background:#fff;border-color:var(--amarelo);
                '<span class="trilho"><span class="cheio" style="width:' + parte + '%"></span></span>' +
                '<span class="qtd">' + numero(origens[o]) + '</span></div>';
       }).join('');
+    }
+    html += '</div>';
+
+    /* vídeos mais clicados */
+    const cliques = {};
+    eventos.forEach(function(v){
+      const nome = String(v.pagina || '');
+      if (nome.indexOf('video: ') !== 0){ return; }
+      const marca = nome.slice(7).trim() || 'sem nome';
+      cliques[marca] = (cliques[marca] || 0) + 1;
+    });
+    const maisClicados = Object.keys(cliques).sort(function(a,b){ return cliques[b] - cliques[a]; });
+
+    html += '<div class="caixa"><p class="caixa-titulo">vídeos mais clicados</p>';
+    if (!maisClicados.length){
+      html += '<p class="vazio">Toda vez que alguém abrir um vídeo no seu portfólio, ele entra nesta lista. ' +
+              'Serve para você saber qual conteúdo puxa mais atenção e colocar os melhores no topo da galeria.</p>';
+    } else {
+      const maiorClique = cliques[maisClicados[0]];
+      html += maisClicados.slice(0,8).map(function(m, i){
+        const parte = maiorClique > 0 ? Math.round((cliques[m] / maiorClique) * 100) : 0;
+        return '<div class="origem"><span class="nome">' + (i+1) + '. ' + escapar(m) + '</span>' +
+               '<span class="trilho"><span class="cheio" style="width:' + parte + '%"></span></span>' +
+               '<span class="qtd">' + numero(cliques[m]) + '</span></div>';
+      }).join('');
+    }
+    html += '</div>';
+
+    /* do primeiro clique até a mensagem */
+    const totalVisitas = paginas.length;
+    const chegouNoForm = eventos.filter(function(v){ return v.pagina === 'secao: contato'; }).length;
+    const mandouMensagem = eventos.filter(function(v){ return v.pagina === 'formulario enviado'; }).length;
+    /* sem visita nenhuma, a conta de porcentagem nem acontece */
+    function parteDe(n){ return totalVisitas > 0 ? Math.round((n / totalVisitas) * 100) + '%' : 'sem base ainda'; }
+
+    html += '<div class="caixa"><p class="caixa-titulo">do primeiro clique até a mensagem</p>';
+    if (totalVisitas === 0){
+      html += '<p class="vazio">Este bloco vai mostrar o caminho que as pessoas fazem no seu site: ' +
+              'quantas abriram o portfólio, quantas rolaram até o formulário e quantas realmente te mandaram mensagem. ' +
+              'Como ainda não houve visita, não tem caminho para desenhar.</p>';
+    } else {
+      html += '<div class="faixa-numeros" style="margin:0;border:0">' +
+        bloco(numero(totalVisitas), 'abriram o portfólio', 'todas as visitas registradas') +
+        bloco(numero(chegouNoForm), 'rolaram até o formulário', parteDe(chegouNoForm) + ' de quem visitou') +
+        bloco(numero(mandouMensagem), 'mandaram mensagem', parteDe(mandouMensagem) + ' de quem visitou') +
+        '</div>';
     }
     html += '</div>';
 
