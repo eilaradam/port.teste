@@ -4,7 +4,7 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <title>Lara Damasceno · Portfólio UGC</title>
-<meta name="description" content="Portfólio UGC de Lara Damasceno: vídeos, fotos e conteúdo para marcas de beleza, skincare, moda, casa e tech.">
+<meta name="description" content="Portfólio UGC de Lara Damasceno: vídeos verticais para marcas de beleza, casa, moda, tech, gastronomia, finanças e mais.">
 <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Crect width='32' height='32' rx='7' fill='%23f7f3e8'/%3E%3Crect x='5' y='8' width='22' height='2' fill='%23c8991f'/%3E%3Crect x='5' y='15' width='22' height='2' fill='%23c8991f'/%3E%3Crect x='5' y='22' width='13' height='2' fill='%23c74b34'/%3E%3C/svg%3E">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -160,14 +160,19 @@ h2 em{font-style:italic;color:var(--tomate)}
 .bloco.tomate{border-left-color:var(--tomate)}
 
 /* =========================================================
-   FOTOS E VÍDEOS (blocos de degradê)
-   Para usar a imagem real, troque a div .foto por:
+   FOTOS E VÍDEOS
+   As capas dos vídeos vêm da miniatura do YouTube (img dentro da .foto).
+   Os espaços que ainda não têm imagem real ficam como bloco de degradê.
+   Para usar a sua foto, troque a div .foto por:
    <img class="foto" src="sua-foto.jpg" alt="descreva a foto">
-   e acrescente no CSS: .foto{object-fit:cover}
    ========================================================= */
 .foto{
   position:relative;border-radius:var(--raio);overflow:hidden;
   border:1px solid var(--borda);width:100%;
+}
+.foto img{
+  position:absolute;inset:0;width:100%;height:100%;
+  object-fit:cover;object-position:center;border:0;
 }
 .foto .legenda{
   position:absolute;left:12px;bottom:12px;
@@ -216,7 +221,7 @@ h1 .sobrenome{display:block;font-style:italic;color:var(--amarelo-escuro)}
   margin-top:70px;border-top:1px solid var(--borda);border-bottom:1px solid var(--borda);
   background:rgba(212,160,23,.12);overflow:hidden;
 }
-.faixa-trilho{display:flex;gap:46px;width:max-content;padding:13px 0;animation:desliza 40s linear infinite}
+.faixa-trilho{display:flex;gap:46px;width:max-content;padding:13px 0;animation:desliza 140s linear infinite}
 .faixa:hover .faixa-trilho{animation-play-state:paused}
 @keyframes desliza{from{transform:translateX(0)}to{transform:translateX(-50%)}}
 .faixa-item{font-family:'Lora',serif;font-style:italic;font-size:1.02rem;color:var(--amarelo-escuro);white-space:nowrap}
@@ -293,7 +298,7 @@ h1 .sobrenome{display:block;font-style:italic;color:var(--amarelo-escuro)}
 }
 .filtro:hover{border-color:var(--amarelo-escuro);color:var(--amarelo-escuro)}
 .filtro[aria-pressed="true"]{background:var(--amarelo);border-color:var(--amarelo);color:var(--tinta)}
-.grade-trabalhos{display:grid;grid-template-columns:repeat(auto-fill,minmax(215px,1fr));gap:20px}
+.grade-trabalhos{display:grid;grid-template-columns:repeat(auto-fill,minmax(200px,1fr));gap:18px}
 .card-trabalho{
   display:block;text-decoration:none;color:inherit;background:var(--papel);
   border:1px solid var(--borda);border-left:5px solid var(--amarelo);
@@ -301,7 +306,7 @@ h1 .sobrenome{display:block;font-style:italic;color:var(--amarelo-escuro)}
   transition:transform .22s ease;
 }
 .card-trabalho:hover{transform:translateY(-4px)}
-.card-trabalho .foto{border:0;border-radius:0;aspect-ratio:4/5}
+.card-trabalho .foto{border:0;border-radius:0;aspect-ratio:9/16}
 .card-trabalho .texto{padding:14px 16px 18px}
 .card-trabalho h3{font-size:1rem;margin-bottom:3px}
 .card-trabalho p{font-size:.84rem;color:var(--tinta-suave);margin:0}
@@ -310,7 +315,14 @@ h1 .sobrenome{display:block;font-style:italic;color:var(--amarelo-escuro)}
   letter-spacing:.12em;text-transform:uppercase;color:var(--amarelo-escuro);
   background:rgba(212,160,23,.18);padding:4px 10px;border-radius:999px;
 }
-.aviso-filtro{margin-top:18px;font-size:.86rem;color:var(--tinta-suave)}
+.aviso-filtro{margin-top:16px;font-size:.86rem;color:var(--tinta-suave);text-align:center}
+.mais-trabalhos{display:flex;justify-content:center;margin-top:30px}
+.play-pequeno{width:46px;height:46px}
+.play-pequeno::after{
+  margin-left:4px;border-left:14px solid var(--tomate);
+  border-top:9px solid transparent;border-bottom:9px solid transparent;
+}
+.card-trabalho:hover .play{transform:scale(1.08)}
 
 /* =========================================================
    SERVIÇOS
@@ -525,7 +537,7 @@ body.card-aberto{overflow:hidden}
         <div>
           <p class="etiqueta">agenda da semana · Caraguatatuba</p>
           <h1>Lara<span class="sobrenome">Damasceno</span></h1>
-          <p class="frase-capa">Eu crio vídeos que vendem sem parecer anúncio, para marcas de beleza, skincare, moda, casa e tech.</p>
+          <p class="frase-capa">Eu crio vídeos que vendem sem parecer anúncio, para marcas de beleza, casa, moda, tech, gastronomia e finanças.</p>
           <div class="botoes">
             <a class="botao" href="#contato">falar comigo</a>
             <a class="botao-linha" href="#trabalhos">ver os trabalhos</a>
@@ -569,7 +581,7 @@ body.card-aberto{overflow:hidden}
             <h2>Prazer, eu sou a <em>Lara</em></h2>
           </div>
           <p>Eu sou criadora de conteúdo UGC em Caraguatatuba e faço isso porque gosto de verdade. Comecei gravando com a luz da janela, um produto na mão e muita vontade de acertar o tom, e não parei mais.</p>
-          <p>Hoje eu ajudo marcas de beleza, skincare, moda, casa e tech a falarem como gente. Eu testo o produto, escrevo o roteiro do meu jeito e gravo pensando em quem está do outro lado, com o celular na mão, decidindo em três segundos se continua assistindo.</p>
+          <p>Hoje eu ajudo marcas de beleza, casa e decoração, moda, tech, gastronomia, drinks, saúde, finanças e viagem a falarem como gente. Eu testo o produto, escrevo o roteiro do meu jeito e gravo pensando em quem está do outro lado, com o celular na mão, decidindo em três segundos se continua assistindo.</p>
           <p>Trabalhar comigo é simples: você me conta o objetivo, eu cuido do resto e te entrego o conteúdo pronto para postar.</p>
 
           <ul class="promessas">
@@ -599,10 +611,10 @@ body.card-aberto{overflow:hidden}
   <!-- ============================ 3. CONTEÚDOS DE DESTAQUE ============================ -->
   <!--
     Os três vídeos vêm do array DESTAQUES, no começo do script.
-    link   = para onde o card leva. Cole aqui o endereço do reels, do tiktok ou do youtube.
-    capa   = a imagem vertical 9:16. Hoje é um bloco de degradê (campo "degrade").
-             Para usar a capa real, troque no HTML gerado a div .foto por:
-             <img class="foto capa-video" src="sua-capa.jpg" alt="Capa do vídeo">
+    id  = o código do vídeo no YouTube, o pedaço que vem depois de /shorts/.
+          É ele que monta o link do card e também a capa vertical 9:16,
+          puxada de https://i.ytimg.com/vi/<id>/maxresdefault.jpg
+    Se a miniatura não carregar, o bloco de degradê continua atrás dela.
   -->
   <section class="secao" id="destaques">
     <div class="container">
@@ -621,10 +633,13 @@ body.card-aberto{overflow:hidden}
       <div class="cabecalho-secao revelar">
         <p class="dia">quarta-feira</p>
         <h2>Trabalhos por <em>nicho</em></h2>
-        <p class="linha-fina">Escolha um nicho e veja só o que interessa para a sua marca.</p>
+        <p class="linha-fina">São 69 vídeos no ar. Escolha um nicho e veja só o que interessa para a sua marca.</p>
       </div>
       <div class="filtros revelar" id="filtros" role="group" aria-label="Filtrar trabalhos por nicho"></div>
       <div class="grade-trabalhos" id="gradeTrabalhos"></div>
+      <div class="mais-trabalhos">
+        <button class="botao-linha" type="button" id="verMais">ver mais trabalhos</button>
+      </div>
       <p class="aviso-filtro" id="avisoFiltro" role="status" aria-live="polite"></p>
     </div>
   </section>
@@ -773,9 +788,13 @@ body.card-aberto{overflow:hidden}
     tiktokLink: '' /* deixe vazio para não aparecer, ou cole o link do seu tiktok */
   };
 
-  /* Marcas da faixa fina da capa (troque pelos nomes reais) */
-  const MARCAS = ['Marca 01','Marca 02','Marca 03','Marca 04','Marca 05','Marca 06',
-                  'Marca 07','Marca 08','Marca 09','Marca 10','Marca 11','Marca 12'];
+  /* Marcas da faixa fina da capa (a ordem do desfile e essa aqui) */
+  const MARCAS = ["L'Oréal","Airbnb","Logitech","InfinitePay","Méliuz","Reclame Aqui","Decolar","Inglot",
+                  "Box Magenta","Coza","DT3","Pharmapele","BV Financeiro","Copacol","Rap10","Coala",
+                  "Noma","Rituaria","Musquee","Quintal","Amobeleza","Belleton","Rarissima",
+                  "Cand Óculos","Bem Me Fiz","Mez Móveis","Vinagreen","Offertus","Velds","Lumai",
+                  "Ateliê","Tropical","Cafeza","Smoo Sorvete","Squadz","Voy","Vero","Focus","Gamma",
+                  "Lust","Midas Time","OKA House"];
 
   /* Degradês usados nos espaços de foto e de vídeo */
   const DEGRADES = [
@@ -785,44 +804,111 @@ body.card-aberto{overflow:hidden}
     'linear-gradient(145deg,#f5f0e3 0%,#dcd4bd 50%,#a89f85 100%)'
   ];
 
-  /* 3 CONTEÚDOS DE DESTAQUE
-     link   = endereço do vídeo (reels, tiktok, youtube). Deixe '#' enquanto não tiver.
-     numero = o número forte que aparece embaixo da capa
-     rotulo = o que aquele número significa
-     degrade = a capa vertical 9:16 (troque pela imagem real quando quiser) */
+  /* 3 CONTEUDOS DE DESTAQUE
+     id      = o codigo do video no youtube (o que vem depois de /shorts/)
+     numero  = o numero forte que aparece embaixo da capa
+     rotulo  = o que aquele numero significa
+     A capa vem sozinha da miniatura do youtube, nao precisa subir imagem.
+     ATENCAO: o numero do terceiro card ainda e placeholder (+0,0M). */
   const DESTAQUES = [
-    { link:'#', numero:'+0,0M', rotulo:'views no reels', titulo:'TÍTULO DO CONTEÚDO 01',
-      contexto:'Escreva aqui uma linha de contexto sobre esse vídeo.', degrade:DEGRADES[0] },
-    { link:'#', numero:'+0,0M', rotulo:'views no tiktok', titulo:'TÍTULO DO CONTEÚDO 02',
-      contexto:'Escreva aqui uma linha de contexto sobre esse vídeo.', degrade:DEGRADES[1] },
-    { link:'#', numero:'+0,0M', rotulo:'views no reels', titulo:'TÍTULO DO CONTEÚDO 03',
-      contexto:'Escreva aqui uma linha de contexto sobre esse vídeo.', degrade:DEGRADES[2] }
+    { id:'5wf8Fv2CTa4', numero:'+100M', rotulo:'views somadas', titulo:'InfinitePay',
+      contexto:'O conteúdo de maior alcance que já entreguei.' },
+    { id:'wesTfq67X9o', numero:'+30M',  rotulo:'views somadas', titulo:'Méliuz',
+      contexto:'Segundo vídeo mais visto do meu portfólio.' },
+    { id:'0g1pFDhxi-4', numero:'+0,0M', rotulo:'views somadas', titulo:'Inglot',
+      contexto:'Beleza é o nicho em que eu mais entrego vídeos.' }
   ];
 
   /* NICHOS dos filtros. A chave precisa bater com o campo "nicho" dos trabalhos. */
   const NICHOS = [
-    { chave:'todos',     rotulo:'todos' },
-    { chave:'beleza',    rotulo:'beleza' },
-    { chave:'skincare',  rotulo:'skincare' },
-    { chave:'moda',      rotulo:'moda' },
-    { chave:'casa',      rotulo:'casa e decoração' },
-    { chave:'tech',      rotulo:'tech' }
+    { chave:"todos",       rotulo:"todos" },
+    { chave:"beleza",      rotulo:"beleza" },
+    { chave:"casa",        rotulo:"casa e decoração" },
+    { chave:"moda",        rotulo:"moda" },
+    { chave:"tech",        rotulo:"tech e apps" },
+    { chave:"gastronomia", rotulo:"gastronomia" },
+    { chave:"drinks",      rotulo:"drinks e sobremesas" },
+    { chave:"saude",       rotulo:"saúde e fitness" },
+    { chave:"financas",    rotulo:"finanças" },
+    { chave:"viagem",      rotulo:"viagem" }
   ];
 
-  /* GALERIA DE TRABALHOS (acrescente ou tire itens à vontade) */
+  /* GALERIA DE TRABALHOS (69 videos)
+     id    = codigo do video no youtube, o que vem depois de /shorts/
+     marca = nome que aparece no card
+     nicho = precisa bater com uma chave do array NICHOS
+     nota  = linha curta embaixo do nome, pode ficar vazia
+     A capa de cada card vem sozinha da miniatura do youtube. */
   const TRABALHOS = [
-    { titulo:'Trabalho 01', marca:'Marca 01', nicho:'beleza',   formato:'vídeo 9:16', link:'#' },
-    { titulo:'Trabalho 02', marca:'Marca 02', nicho:'beleza',   formato:'foto 4:5',   link:'#' },
-    { titulo:'Trabalho 03', marca:'Marca 03', nicho:'skincare', formato:'vídeo 9:16', link:'#' },
-    { titulo:'Trabalho 04', marca:'Marca 04', nicho:'skincare', formato:'unboxing 9:16', link:'#' },
-    { titulo:'Trabalho 05', marca:'Marca 05', nicho:'moda',     formato:'vídeo 9:16', link:'#' },
-    { titulo:'Trabalho 06', marca:'Marca 06', nicho:'moda',     formato:'foto 4:5',   link:'#' },
-    { titulo:'Trabalho 07', marca:'Marca 07', nicho:'casa',     formato:'vídeo 9:16', link:'#' },
-    { titulo:'Trabalho 08', marca:'Marca 08', nicho:'casa',     formato:'foto 4:5',   link:'#' },
-    { titulo:'Trabalho 09', marca:'Marca 09', nicho:'casa',     formato:'corte para anúncio 9:16', link:'#' },
-    { titulo:'Trabalho 10', marca:'Marca 10', nicho:'tech',     formato:'vídeo 9:16', link:'#' },
-    { titulo:'Trabalho 11', marca:'Marca 11', nicho:'tech',     formato:'unboxing 9:16', link:'#' },
-    { titulo:'Trabalho 12', marca:'Marca 12', nicho:'beleza',   formato:'foto 4:5',   link:'#' }
+    { marca:"Noma",           id:"TbRE2_mezCg",  nicho:"beleza",       nota:"" },
+    { marca:"L'Oréal",        id:"6kvtFKsPQPw",  nicho:"beleza",       nota:"skincare noturno" },
+    { marca:"Inglot",         id:"0g1pFDhxi-4",  nicho:"beleza",       nota:"" },
+    { marca:"Rituaria",       id:"Yt_UjtmiMgg",  nicho:"beleza",       nota:"" },
+    { marca:"Rituaria",       id:"CzO13_qS6Fs",  nicho:"beleza",       nota:"" },
+    { marca:"Musquee",        id:"ctKWcVRF35k",  nicho:"beleza",       nota:"" },
+    { marca:"Quintal",        id:"U_T_I-vcM7k",  nicho:"beleza",       nota:"" },
+    { marca:"Quintal",        id:"aTe89tMdv28",  nicho:"beleza",       nota:"" },
+    { marca:"Quintal",        id:"UCgbmlmT618",  nicho:"beleza",       nota:"" },
+    { marca:"Amobeleza",      id:"V5gvw_l08go",  nicho:"beleza",       nota:"" },
+    { marca:"Belleton",       id:"_d2dByXfvIw",  nicho:"beleza",       nota:"" },
+    { marca:"Rarissima",      id:"dj9LD5x8MWI",  nicho:"beleza",       nota:"" },
+    { marca:"Box Magenta",    id:"XwhHAl2LJ6k",  nicho:"beleza",       nota:"" },
+    { marca:"Box Magenta",    id:"cDRldAKYyKU",  nicho:"beleza",       nota:"" },
+    { marca:"Cand Óculos",    id:"JPz1wMt_R4I",  nicho:"beleza",       nota:"" },
+    { marca:"Bem Me Fiz",     id:"P3UrVHbwI9g",  nicho:"beleza",       nota:"" },
+    { marca:"Botox",          id:"YOmm3Zi87PE",  nicho:"beleza",       nota:"" },
+    { marca:"Coza",           id:"nbq1HzdlPJE",  nicho:"casa",         nota:"" },
+    { marca:"DT3",            id:"Imt3HZDlCXU",  nicho:"casa",         nota:"" },
+    { marca:"DT3",            id:"JwblS_1IReM",  nicho:"casa",         nota:"" },
+    { marca:"DT3",            id:"RPNeR2ANyrM",  nicho:"casa",         nota:"" },
+    { marca:"Coza",           id:"1Fm5v3bSdKM",  nicho:"casa",         nota:"" },
+    { marca:"Coala",          id:"plSEfBiygVw",  nicho:"casa",         nota:"" },
+    { marca:"Coala",          id:"tClA-xjxP68",  nicho:"casa",         nota:"" },
+    { marca:"Mez Móveis",     id:"R-y96AP_NLo",  nicho:"casa",         nota:"" },
+    { marca:"Mez Móveis",     id:"mEc4A2oJ0_w",  nicho:"casa",         nota:"" },
+    { marca:"Vinagreen",      id:"8T_dTUk5oX4",  nicho:"casa",         nota:"" },
+    { marca:"Offertus",       id:"ucf6vv64SNY",  nicho:"casa",         nota:"" },
+    { marca:"Velds",          id:"TZK3XeajRyI",  nicho:"casa",         nota:"" },
+    { marca:"Velds",          id:"i9dHLO0VlFk",  nicho:"casa",         nota:"" },
+    { marca:"Lumai",          id:"2y9Xe6Q5eMc",  nicho:"casa",         nota:"" },
+    { marca:"Lumai",          id:"0Mkvi_n-bFU",  nicho:"casa",         nota:"" },
+    { marca:"Ateliê",         id:"0FhBNV71z9A",  nicho:"gastronomia",  nota:"" },
+    { marca:"Ateliê",         id:"XmjA7cpCPfQ",  nicho:"gastronomia",  nota:"" },
+    { marca:"Rap10",          id:"orhbzi_XYiA",  nicho:"gastronomia",  nota:"" },
+    { marca:"Rap10",          id:"It7GiFzsOe0",  nicho:"gastronomia",  nota:"" },
+    { marca:"Copacol",        id:"Kq93tU1dYuA",  nicho:"gastronomia",  nota:"" },
+    { marca:"Tropical",       id:"QgCK-EJKTm0",  nicho:"drinks",       nota:"" },
+    { marca:"Cafeza",         id:"R-PC_tGXdFk",  nicho:"drinks",       nota:"" },
+    { marca:"Tropical",       id:"bUf0ItCQdUU",  nicho:"drinks",       nota:"" },
+    { marca:"Tropical",       id:"vFmYLAliwIk",  nicho:"drinks",       nota:"" },
+    { marca:"Smoo Sorvete",   id:"AXzcHi_Qq_Y",  nicho:"drinks",       nota:"" },
+    { marca:"Squadz",         id:"vbQW-1VEjPk",  nicho:"saude",        nota:"" },
+    { marca:"Pharmapele",     id:"_6sCm4K8DRE",  nicho:"saude",        nota:"creatina" },
+    { marca:"Pharmapele",     id:"Eul1uuQhU7g",  nicho:"saude",        nota:"" },
+    { marca:"Pharmapele",     id:"K31BzOy3qt0",  nicho:"saude",        nota:"emagrecimento" },
+    { marca:"Voy",            id:"ZVNvzvdz4Ow",  nicho:"saude",        nota:"emagrecimento" },
+    { marca:"InfinitePay",    id:"5wf8Fv2CTa4",  nicho:"financas",     nota:"" },
+    { marca:"Méliuz",         id:"wesTfq67X9o",  nicho:"financas",     nota:"" },
+    { marca:"Méliuz",         id:"GPcPWfWmA3A",  nicho:"financas",     nota:"app" },
+    { marca:"BV Financeiro",  id:"2NMavMHi4jM",  nicho:"financas",     nota:"" },
+    { marca:"BV Financeiro",  id:"Q_n4uwkxiDo",  nicho:"financas",     nota:"" },
+    { marca:"Vero",           id:"8QRM5LPK5M8",  nicho:"tech",         nota:"" },
+    { marca:"Focus",          id:"GvLjL_Ru19U",  nicho:"tech",         nota:"" },
+    { marca:"Logitech",       id:"sspAuh3TFqw",  nicho:"tech",         nota:"" },
+    { marca:"Logitech",       id:"xyaWdRi9pK4",  nicho:"tech",         nota:"" },
+    { marca:"Reclame Aqui",   id:"DxiroerLBGw",  nicho:"tech",         nota:"" },
+    { marca:"Gamma",          id:"nZQoMA114MA",  nicho:"tech",         nota:"" },
+    { marca:"Lust",           id:"nV1oWxv_J_4",  nicho:"moda",         nota:"outfit do dia" },
+    { marca:"Midas Time",     id:"wZgUdGFouNA",  nicho:"moda",         nota:"" },
+    { marca:"Midas Time",     id:"t2aysMm2INg",  nicho:"moda",         nota:"" },
+    { marca:"Midas Time",     id:"QE-bUfK8z14",  nicho:"moda",         nota:"" },
+    { marca:"Rarissima",      id:"_YF_bwGgC0Y",  nicho:"moda",         nota:"" },
+    { marca:"Rarissima",      id:"Nhq12rZkpa8",  nicho:"moda",         nota:"" },
+    { marca:"OKA House",      id:"7TzuVW8847A",  nicho:"viagem",       nota:"" },
+    { marca:"OKA House",      id:"DzIWctdbjgg",  nicho:"viagem",       nota:"" },
+    { marca:"Airbnb",         id:"s5iwpfzgxbI",  nicho:"viagem",       nota:"" },
+    { marca:"Airbnb",         id:"wUxGOQ3QwFw",  nicho:"viagem",       nota:"" },
+    { marca:"Decolar",        id:"Y8nN7CMb73U",  nicho:"viagem",       nota:"app" }
   ];
 
   /* SEIS SERVIÇOS */
@@ -846,7 +932,7 @@ body.card-aberto{overflow:hidden}
   /* TRÊS RESULTADOS DE CAMPANHA (troque pelos seus números reais) */
   const RESULTADOS = [
     { destaque:'00%', rotulo:'PLACEHOLDER: o resultado', texto:'Conte em uma linha o que essa campanha alcançou.', quem:'Marca 01 · beleza' },
-    { destaque:'00%', rotulo:'PLACEHOLDER: o resultado', texto:'Conte em uma linha o que essa campanha alcançou.', quem:'Marca 02 · skincare' },
+    { destaque:'00%', rotulo:'PLACEHOLDER: o resultado', texto:'Conte em uma linha o que essa campanha alcançou.', quem:'Marca 02 · finanças' },
     { destaque:'00%', rotulo:'PLACEHOLDER: o resultado', texto:'Conte em uma linha o que essa campanha alcançou.', quem:'Marca 03 · casa e decoração' }
   ];
 
@@ -872,6 +958,9 @@ body.card-aberto{overflow:hidden}
   /* Segundos até o card do mídia kit aparecer */
   const SEGUNDOS_PARA_O_CARD = 7;
 
+  /* Quantos trabalhos aparecem antes do botão "ver mais trabalhos" */
+  const POR_PAGINA = 12;
+
   /* =======================================================================
      ====================  FIM DOS DADOS PARA EDITAR  ======================
      ======================================================================= */
@@ -880,6 +969,9 @@ body.card-aberto{overflow:hidden}
   const $$ = function(s,e){ return Array.prototype.slice.call((e||document).querySelectorAll(s)); };
   const menosMovimento = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
   const degrade = function(i){ return DEGRADES[i % DEGRADES.length]; };
+  /* monta o endereço do vídeo e da capa a partir do id do youtube */
+  const linkDoVideo = function(id){ return 'https://youtube.com/shorts/' + id; };
+  const capaDoVideo = function(id){ return 'https://i.ytimg.com/vi/' + id + '/maxresdefault.jpg'; };
 
   /* ---------- números da capa ---------- */
   $('#numerosCapa').innerHTML = METRICAS.slice(0,3).map(function(m){
@@ -896,14 +988,14 @@ body.card-aberto{overflow:hidden}
 
   /* ---------- conteúdos de destaque ---------- */
   $('#gradeDestaques').innerHTML = DESTAQUES.map(function(d,i){
-    /* o card inteiro é um link: o endereço vem do campo "link" do array DESTAQUES */
-    return '<a class="card-video revelar" href="' + d.link + '" target="_blank" rel="noopener" ' +
-             'aria-label="Assistir: ' + d.titulo + '">' +
-             /* capa vertical 9:16: troque esta div por <img> quando tiver a imagem */
-             '<div class="foto capa-video" style="background:' + d.degrade + '" role="img" ' +
-                  'aria-label="Espaço reservado para a capa do vídeo, formato 9 por 16">' +
+    /* o card inteiro é um link: o endereço é montado a partir do id do vídeo */
+    return '<a class="card-video revelar" href="' + linkDoVideo(d.id) + '" target="_blank" rel="noopener" ' +
+             'aria-label="Assistir o vídeo que fiz para ' + d.titulo + '">' +
+             /* capa vertical 9:16: a miniatura do youtube por cima do degradê */
+             '<div class="foto capa-video" style="background:' + degrade(i) + '">' +
+               '<img src="' + capaDoVideo(d.id) + '" loading="lazy" decoding="async" ' +
+                    'alt="Capa do vídeo que fiz para ' + d.titulo + '">' +
                '<span class="play" aria-hidden="true"></span>' +
-               '<span class="legenda">capa do vídeo 9:16</span>' +
              '</div>' +
              '<div class="info-video">' +
                '<span class="forte">' + d.numero + '</span>' +
@@ -919,44 +1011,69 @@ body.card-aberto{overflow:hidden}
     return '<button class="filtro" type="button" data-nicho="' + n.chave + '" aria-pressed="' + (i === 0) + '">' + n.rotulo + '</button>';
   }).join('');
 
+  function rotuloDoNicho(chave){
+    return (NICHOS.filter(function(n){ return n.chave === chave; })[0] || {}).rotulo || chave;
+  }
+
   $('#gradeTrabalhos').innerHTML = TRABALHOS.map(function(t,i){
-    const rot = (NICHOS.filter(function(n){ return n.chave === t.nicho; })[0] || {}).rotulo || t.nicho;
-    /* o link de cada trabalho fica no campo "link" do array TRABALHOS */
-    return '<a class="card-trabalho revelar" href="' + t.link + '" data-nicho="' + t.nicho + '">' +
-             '<div class="foto" style="background:' + degrade(i) + '" role="img" ' +
-                  'aria-label="Espaço reservado para a imagem do trabalho ' + t.titulo + '">' +
-               '<span class="legenda">' + t.formato + '</span>' +
+    /* cada card abre o vídeo no youtube e usa a miniatura dele como capa */
+    return '<a class="card-trabalho revelar" href="' + linkDoVideo(t.id) + '" target="_blank" ' +
+             'rel="noopener" data-nicho="' + t.nicho + '" ' +
+             'aria-label="Assistir o vídeo que fiz para ' + t.marca + '">' +
+             '<div class="foto" style="background:' + degrade(i) + '">' +
+               '<img src="' + capaDoVideo(t.id) + '" loading="lazy" decoding="async" ' +
+                    'alt="Capa do vídeo que fiz para ' + t.marca + '">' +
+               '<span class="play play-pequeno" aria-hidden="true"></span>' +
              '</div>' +
              '<div class="texto">' +
-               '<h3>' + t.titulo + '</h3>' +
-               '<p>' + t.marca + '</p>' +
-               '<span class="tag">' + rot + '</span>' +
+               '<h3>' + t.marca + '</h3>' +
+               '<p>' + (t.nota || 'vídeo UGC 9:16') + '</p>' +
+               '<span class="tag">' + rotuloDoNicho(t.nicho) + '</span>' +
              '</div>' +
            '</a>';
   }).join('');
 
+  /* se alguma miniatura não carregar, some com ela e fica o degradê atrás */
+  $$('#gradeTrabalhos img, #gradeDestaques img').forEach(function(img){
+    img.addEventListener('error', function(){ img.remove(); });
+  });
+
   const cards = $$('#gradeTrabalhos .card-trabalho');
   const aviso = $('#avisoFiltro');
+  const btnMais = $('#verMais');
+  let nichoAtual = 'todos';
+  let quantos = POR_PAGINA;
 
-  function filtrar(chave){
-    let visiveis = 0;
-    cards.forEach(function(c){
-      const mostra = (chave === 'todos' || c.dataset.nicho === chave);
-      c.hidden = !mostra;
-      if (mostra){ visiveis++; }
+  function mostrarTrabalhos(){
+    const doNicho = cards.filter(function(c){
+      return nichoAtual === 'todos' || c.dataset.nicho === nichoAtual;
     });
-    const rot = (NICHOS.filter(function(n){ return n.chave === chave; })[0] || {}).rotulo || chave;
-    aviso.textContent = visiveis + (visiveis === 1 ? ' trabalho em ' : ' trabalhos em ') + rot + '.';
+    cards.forEach(function(c){ c.hidden = true; });
+    doNicho.slice(0, quantos).forEach(function(c){ c.hidden = false; });
+
+    const visiveis = Math.min(quantos, doNicho.length);
+    btnMais.hidden = doNicho.length <= quantos;
+    aviso.textContent = 'mostrando ' + visiveis + ' de ' + doNicho.length +
+      (doNicho.length === 1 ? ' trabalho em ' : ' trabalhos em ') + rotuloDoNicho(nichoAtual) + '.';
   }
 
   $$('#filtros .filtro').forEach(function(b){
     b.addEventListener('click', function(){
       $$('#filtros .filtro').forEach(function(o){ o.setAttribute('aria-pressed','false'); });
       b.setAttribute('aria-pressed','true');
-      filtrar(b.dataset.nicho);
+      nichoAtual = b.dataset.nicho;
+      quantos = POR_PAGINA;
+      mostrarTrabalhos();
     });
   });
-  filtrar('todos');
+
+  btnMais.addEventListener('click', function(){
+    quantos += POR_PAGINA;
+    mostrarTrabalhos();
+    if (btnMais.hidden){ aviso.focus && aviso.focus(); }
+  });
+
+  mostrarTrabalhos();
 
   /* ---------- serviços ---------- */
   $('#gradeServicos').innerHTML = SERVICOS.map(function(s,i){
