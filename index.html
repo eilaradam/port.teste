@@ -1443,12 +1443,21 @@ body.card-aberto{overflow:hidden}
           Se o banco falhar, a confirmação aparece do mesmo jeito:
           o formulário nunca deixa a pessoa na mão. */
     if (banco){
-      banco.from('marcas').insert({
+      /* manda com a marcação de origem. Se a coluna origem ainda
+         não existir no banco, tenta de novo sem ela, para o contato
+         nunca se perder por causa de um campo que falta. */
+      const contato = {
         nome: nome.value.trim(),
         email: email.value.trim(),
         situacao: 'lead',
         obs: msg.value.trim()
-      }).then(function(){}, function(){});
+      };
+      banco.from('marcas').insert(Object.assign({ origem: 'site' }, contato))
+        .then(function(r){
+          if (r && r.error){ banco.from('marcas').insert(contato).then(function(){}, function(){}); }
+        }, function(){
+          banco.from('marcas').insert(contato).then(function(){}, function(){});
+        });
       anotar('formulario enviado');
     }
 

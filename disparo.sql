@@ -28,6 +28,12 @@ alter table public.marcas
 alter table public.marcas
   add column if not exists enviado_em date;
 
+-- De onde esse contato veio: 'site' quando a pessoa preencheu o
+-- formulário do portfólio, vazio quando você cadastrou na mão ou
+-- importou da planilha. É o que separa os leads novos do resto.
+alter table public.marcas
+  add column if not exists origem text not null default '';
+
 
 -- ============================================================
 --  PARTE 2 · O CADERNO DE REGISTRO DOS ENVIOS

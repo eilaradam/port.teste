@@ -147,6 +147,19 @@ button{font:inherit;color:inherit}
   text-align:center;color:var(--tinta-suave);font-size:.86rem;
   padding:26px 14px;background:var(--creme);border-radius:var(--raio-p);border:1px dashed var(--borda);
 }
+.lead-site{
+  display:flex;gap:12px;align-items:flex-start;padding:11px 0;border-bottom:1px solid var(--borda-leve);
+}
+.lead-site:last-child{border-bottom:0}
+.lead-site .quando{
+  flex:0 0 74px;font-size:.72rem;font-weight:800;color:var(--apagado);padding-top:2px;
+}
+.lead-site .recado{font-size:.84rem;color:var(--tinta-suave);margin-top:3px;line-height:1.5}
+.lead-site .acoes-lead{margin-left:auto;display:flex;gap:6px;flex-wrap:wrap;align-items:center}
+.selo-novo{
+  background:rgba(199,75,52,.14);color:#8f2f1c;font-size:.62rem;font-weight:800;
+  letter-spacing:.08em;text-transform:uppercase;padding:2px 8px;border-radius:999px;margin-left:7px;
+}
 .origem{display:flex;align-items:center;gap:10px;padding:7px 0;border-bottom:1px solid var(--borda-leve)}
 .origem:last-child{border-bottom:0}
 .origem .nome{flex:0 0 130px;font-size:.84rem;font-weight:600;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
@@ -946,6 +959,7 @@ tr.escolhida{background:rgba(212,160,23,.09)}
 
   function irPara(nome){
     if (!ABAS[nome]){ nome = 'portfolio'; }
+    if (typeof pararRelogioDosLeads === 'function'){ pararRelogioDosLeads(); }
     abaAtual = nome;
     $$('.item').forEach(function(b){ b.classList.toggle('ativo', b.dataset.aba === nome); });
     $('#tituloAba').textContent = ABAS[nome].titulo;
@@ -1011,6 +1025,8 @@ tr.escolhida{background:rgba(212,160,23,.09)}
       bloco(nichoTop ? nichoTop : 'sem vídeo', 'nicho mais forte', nichoTop ? porNicho[nichoTop] + ' vídeos' : '') +
       bloco(origemTop ? origemTop : 'sem visita', 'de onde mais vêm', origemTop ? numero(origens[origemTop]) + ' visitas' : '') +
       '</div>';
+
+    html += blocoLeadsDoSite();
 
     /* gráfico dos 14 dias, ou a frase explicando o que vai aparecer */
     html += '<div class="caixa"><p class="caixa-titulo">visitas dos últimos 14 dias</p>';
@@ -1095,6 +1111,120 @@ tr.escolhida{background:rgba(212,160,23,.09)}
 
     $('#painel').innerHTML = html;
     ligarTabelaVideos();
+    ligarLeadsDoSite();
+    ligarRelogioDosLeads();
+  }
+
+  /* ---------- quem preencheu o formulário do portfólio ---------- */
+  function leadsDoSite(){
+    return dados.marcas.filter(function(m){ return m.origem === 'site'; })
+      .slice().sort(function(a,b){
+        return String(b.criado_em || '').localeCompare(String(a.criado_em || ''));
+      });
+  }
+
+  function quandoChegou(criadoEm){
+    const d = criadoEm ? new Date(criadoEm) : null;
+    if (!d || isNaN(d.getTime())){ return { texto:'·', novo:false }; }
+    const minutos = Math.round((Date.now() - d.getTime()) / 60000);
+    const novo = minutos < 1440;
+    let texto;
+    if (minutos < 1){ texto = 'agora'; }
+    else if (minutos < 60){ texto = 'há ' + minutos + ' min'; }
+    else if (minutos < 1440){ texto = 'há ' + Math.round(minutos/60) + 'h'; }
+    else {
+      texto = String(d.getDate()).padStart(2,'0') + '/' + String(d.getMonth()+1).padStart(2,'0');
+    }
+    return { texto: texto, novo: novo };
+  }
+
+  function blocoLeadsDoSite(){
+    const lista = leadsDoSite();
+    const agora = new Date();
+    const hora = String(agora.getHours()).padStart(2,'0') + ':' + String(agora.getMinutes()).padStart(2,'0');
+
+    let html = '<div class="caixa">' +
+      '<div style="display:flex;align-items:center;gap:10px;flex-wrap:wrap;margin-bottom:10px">' +
+        '<p class="caixa-titulo" style="margin:0">quem preencheu o formulário do site</p>' +
+        '<span style="flex:1"></span>' +
+        '<span style="font-size:.72rem;color:var(--apagado)">atualizado às ' + hora + '</span>' +
+        '<button class="chip" type="button" id="atualizarLeads">atualizar agora</button>' +
+      '</div>';
+
+    if (!lista.length){
+      html += '<p class="vazio">Ninguém preencheu o formulário do seu portfólio ainda. ' +
+        'Quando alguém preencher, o contato aparece aqui na hora, com o nome, o e-mail e a mensagem que a pessoa escreveu. ' +
+        'Esta lista se atualiza sozinha enquanto você estiver com esta aba aberta.</p>';
+    } else {
+      html += lista.slice(0, 15).map(function(m){
+        const q = quandoChegou(m.criado_em);
+        const tel = String(m.telefone || '').replace(/\D/g,'');
+        return '<div class="lead-site">' +
+          '<span class="quando">' + escapar(q.texto) + '</span>' +
+          '<span style="flex:1;min-width:0">' +
+            '<strong>' + escapar(m.nome || 'sem nome') + '</strong>' +
+            (q.novo ? '<span class="selo-novo">novo</span>' : '') +
+            '<span class="recado" style="display:block">' + escapar(m.obs || 'sem mensagem') + '</span>' +
+            '<span style="display:block;font-size:.78rem;color:var(--apagado);margin-top:3px">' +
+              escapar(m.email || 'sem e-mail') + '</span>' +
+          '</span>' +
+          '<span class="acoes-lead">' +
+            (m.email ? '<a class="mini" href="mailto:' + escapar(m.email) + '" aria-label="Responder por e-mail" title="responder por e-mail">' +
+              '<svg viewBox="0 0 24 24"><rect x="2.5" y="5" width="19" height="14" rx="2"/><path d="M3 7l9 6 9-6"/></svg></a>' : '') +
+            (tel ? '<a class="mini" href="https://wa.me/' + (tel.length <= 11 ? '55' + tel : tel) + '" target="_blank" rel="noopener" aria-label="Abrir o WhatsApp" title="abrir o WhatsApp">' +
+              '<svg viewBox="0 0 24 24"><path d="M21 12a9 9 0 0 1-13.4 7.8L3 21l1.3-4.4A9 9 0 1 1 21 12z"/></svg></a>' : '') +
+            '<button class="mini" type="button" data-abrir-lead="' + m.id + '" aria-label="Abrir o cadastro" title="abrir o cadastro completo">' +
+              '<svg viewBox="0 0 24 24"><path d="M12 20h9M16.5 3.5a2.1 2.1 0 0 1 3 3L7 19l-4 1 1-4z"/></svg></button>' +
+          '</span>' +
+        '</div>';
+      }).join('');
+
+      if (lista.length > 15){
+        html += '<p style="margin-top:10px;font-size:.78rem;color:var(--apagado)">' +
+          'Mostrando os 15 mais recentes de ' + lista.length + '. O resto está na aba Marcas.</p>';
+      }
+    }
+    return html + '</div>';
+  }
+
+  function ligarLeadsDoSite(){
+    const botao = $('#atualizarLeads');
+    if (botao){
+      botao.addEventListener('click', async function(){
+        botao.disabled = true;
+        botao.textContent = 'buscando...';
+        dados.marcas = await ler('marcas', 'nome', true);
+        desenharPortfolio();
+      });
+    }
+    $$('[data-abrir-lead]').forEach(function(b){
+      b.addEventListener('click', function(){
+        const m = dados.marcas.filter(function(x){ return String(x.id) === b.dataset.abrirLead; })[0];
+        if (m){ formMarca(m); }
+      });
+    });
+  }
+
+  /* procura contato novo de tempos em tempos, e só redesenha se
+     chegou alguém, para não atrapalhar enquanto ela está mexendo */
+  let relogioLeads = null;
+  function ligarRelogioDosLeads(){
+    pararRelogioDosLeads();
+    relogioLeads = setInterval(async function(){
+      if (abaAtual !== 'portfolio'){ pararRelogioDosLeads(); return; }
+      const antes = leadsDoSite().length;
+      const novos = await ler('marcas', 'nome', true);
+      if (!novos.length){ return; }
+      const depois = novos.filter(function(m){ return m.origem === 'site'; }).length;
+      if (depois !== antes){
+        dados.marcas = novos;
+        avisinho(depois > antes ? 'Chegou contato novo pelo site.' : 'Lista de contatos atualizada.');
+        desenharPortfolio();
+      }
+    }, 45000);
+  }
+  function pararRelogioDosLeads(){
+    if (relogioLeads){ clearInterval(relogioLeads); relogioLeads = null; }
   }
 
   function bloco(n, r, sub){
@@ -2143,6 +2273,7 @@ tr.escolhida{background:rgba(212,160,23,.09)}
   let filtroSituacao = 'todas';
   let filtroNicho = 'todos';
   let soFavoritas = false;
+  let soDoSite = false;
 
   function desenharMarcas(){
     $('#acaoDaAba').innerHTML =
@@ -2153,6 +2284,7 @@ tr.escolhida{background:rgba(212,160,23,.09)}
 
     const lista = dados.marcas.filter(function(m){
       if (soFavoritas && !m.favorita){ return false; }
+      if (soDoSite && m.origem !== 'site'){ return false; }
       if (filtroSituacao !== 'todas' && m.situacao !== filtroSituacao){ return false; }
       if (filtroNicho === 'sem' && (m.nicho || '')){ return false; }
       if (filtroNicho !== 'todos' && filtroNicho !== 'sem' && m.nicho !== filtroNicho){ return false; }
@@ -2175,6 +2307,7 @@ tr.escolhida{background:rgba(212,160,23,.09)}
         return '<button class="chip" type="button" data-sit="' + s.v + '" aria-pressed="' + (filtroSituacao===s.v) + '">' + s.t + '</button>';
       }).join('') +
       '<button class="chip" type="button" id="soFav" aria-pressed="' + soFavoritas + '">só as fixadas</button>' +
+      '<button class="chip" type="button" id="soDoSite" aria-pressed="' + soDoSite + '">vieram do site</button>' +
       '<select id="filtroNicho" class="chip" style="padding-right:26px">' +
         '<option value="todos"' + (filtroNicho==='todos'?' selected':'') + '>todos os nichos</option>' +
         '<option value="sem"' + (filtroNicho==='sem'?' selected':'') + '>sem nicho</option>' +
@@ -2275,6 +2408,7 @@ tr.escolhida{background:rgba(212,160,23,.09)}
       desenharMarcas();
     });
     $('#soFav').addEventListener('click', function(){ soFavoritas = !soFavoritas; desenharMarcas(); });
+    $('#soDoSite').addEventListener('click', function(){ soDoSite = !soDoSite; desenharMarcas(); });
     $$('[data-marca]').forEach(function(tr){
       tr.addEventListener('click', function(ev){
         if (ev.target.closest('[data-parar]')){ return; }
