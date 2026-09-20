@@ -388,6 +388,101 @@ textarea.transcricao:focus{outline:none;background:#fff;border-color:var(--amare
 .passo b{font-weight:800;color:var(--tinta)}
 @media(max-width:900px){ .tr-detalhe{grid-template-columns:1fr} .tr-video.alto{height:520px} }
 
+/* =========================================================
+   PROSPECÇÃO
+   ========================================================= */
+.capa-pros{
+  position:relative;overflow:hidden;border-radius:20px;padding:24px 26px;margin-bottom:18px;
+  background:linear-gradient(135deg, var(--amarelo) 0%, var(--amarelo-escuro) 100%);
+  color:#fff;
+}
+.capa-pros .linha1{display:flex;align-items:flex-start;gap:16px;flex-wrap:wrap}
+.capa-pros .selo-icone{
+  flex:0 0 auto;width:44px;height:44px;border-radius:13px;
+  background:rgba(255,255,255,.2);display:grid;place-items:center;
+}
+.capa-pros .selo-icone svg{width:22px;height:22px;stroke:#fff;fill:none;stroke-width:1.6;stroke-linecap:round;stroke-linejoin:round}
+.capa-pros h2{font-size:1.32rem;font-weight:800;line-height:1.15;color:#fff}
+.capa-pros p{font-size:.88rem;color:rgba(255,255,255,.9);margin:3px 0 0;max-width:46ch}
+.capa-pros .total{margin-left:auto;text-align:right}
+.capa-pros .total .n{font-size:2.1rem;font-weight:800;line-height:1}
+.capa-pros .total .r{font-size:.68rem;font-weight:800;letter-spacing:.12em;text-transform:uppercase;color:rgba(255,255,255,.85)}
+.capa-pros .etiquetas{display:flex;flex-wrap:wrap;gap:8px;margin-top:16px}
+.capa-pros .etiquetas span{
+  background:rgba(255,255,255,.18);border:1px solid rgba(255,255,255,.25);
+  border-radius:999px;padding:5px 13px;font-size:.76rem;font-weight:700;
+}
+
+.cartoes-pros{display:grid;grid-template-columns:repeat(auto-fit,minmax(158px,1fr));gap:12px;margin-bottom:18px}
+.cartao-num{
+  background:var(--papel);border:1px solid var(--borda);border-left:4px solid var(--amarelo);
+  border-radius:var(--raio);padding:13px 15px;
+}
+.cartao-num .n{font-size:1.5rem;font-weight:800;line-height:1.1;color:var(--amarelo-escuro)}
+.cartao-num .r{font-size:.68rem;font-weight:800;letter-spacing:.1em;text-transform:uppercase;color:var(--apagado);margin-top:4px}
+.cartao-num .sub{font-size:.74rem;color:var(--tinta-suave);margin-top:2px}
+.cartao-num.verde{border-left-color:var(--verde)}   .cartao-num.verde .n{color:#46522f}
+.cartao-num.ambar{border-left-color:#c8891f}        .cartao-num.ambar .n{color:#95651a}
+.cartao-num.azul{border-left-color:var(--azul)}     .cartao-num.azul .n{color:#2f5462}
+.cartao-num.vermelho{border-left-color:var(--tomate)} .cartao-num.vermelho .n{color:#8f2f1c}
+
+.pros-grade{display:grid;grid-template-columns:1fr 1fr;gap:18px;align-items:start}
+.palco{
+  position:sticky;top:16px;background:rgba(43,40,34,.055);
+  border:1px solid var(--borda);border-radius:var(--raio);padding:16px;
+}
+.palco-topo{display:flex;align-items:center;gap:10px;margin-bottom:12px}
+.janela-email{
+  background:#fff;border-radius:14px;box-shadow:0 14px 34px rgba(43,40,34,.14);overflow:hidden;
+}
+.email-cabeca{display:flex;gap:11px;align-items:flex-start;padding:14px 16px;border-bottom:1px solid #eee}
+.email-avatar{
+  flex:0 0 auto;width:36px;height:36px;border-radius:50%;background:var(--amarelo);
+  color:#fff;display:grid;place-items:center;font-weight:800;font-size:1rem;
+}
+.email-assunto{font-size:.98rem;font-weight:800;line-height:1.25;color:var(--tinta)}
+.email-de{font-size:.76rem;color:var(--tinta-suave);margin-top:2px}
+.email-corpo{padding:4px 0;max-height:52vh;overflow:auto;background:#fff}
+.nota-previa{font-size:.76rem;color:var(--apagado);margin-top:10px;text-align:center}
+
+.modos{display:flex;gap:6px;margin-bottom:12px}
+.aviso-origem{
+  font-size:.79rem;color:var(--tinta-suave);background:var(--creme);
+  border-left:3px solid var(--amarelo);border-radius:0 8px 8px 0;padding:8px 11px;margin-bottom:10px;
+}
+textarea.email-texto{
+  width:100%;min-height:190px;font:inherit;font-size:.88rem;line-height:1.6;
+  background:var(--creme);border:1px solid var(--borda);border-radius:var(--raio-p);padding:11px;resize:vertical;color:var(--tinta);
+}
+textarea.email-codigo{
+  width:100%;min-height:220px;font-family:ui-monospace,SFMono-Regular,Menlo,monospace;font-size:.79rem;
+  line-height:1.55;background:var(--creme);border:1px solid var(--borda);border-radius:var(--raio-p);
+  padding:11px;resize:vertical;color:var(--tinta);
+}
+textarea.email-texto:focus,textarea.email-codigo:focus{
+  outline:none;background:#fff;border-color:var(--amarelo);box-shadow:0 0 0 3px rgba(212,160,23,.2);
+}
+.fila-item{
+  background:var(--papel);border:1px solid var(--borda);border-left:4px solid var(--amarelo);
+  border-radius:var(--raio);padding:14px 16px;margin-bottom:10px;
+}
+.fila-item h4{font-size:.95rem;font-weight:800}
+.fila-item .para{font-size:.8rem;color:var(--tinta-suave);margin-top:2px}
+.fila-corpo{
+  background:var(--creme);border:1px solid var(--borda);border-radius:var(--raio-p);
+  padding:11px;margin:10px 0;font-size:.84rem;line-height:1.55;white-space:pre-wrap;max-height:180px;overflow:auto;
+}
+.fundo-cheio{
+  position:fixed;inset:0;z-index:140;background:rgba(43,40,34,.66);
+  display:flex;align-items:center;justify-content:center;padding:20px;
+}
+.cheio-janela{width:100%;max-width:620px;max-height:calc(100vh - 40px);overflow:auto;background:#fff;border-radius:16px}
+
+@media(max-width:1000px){
+  .pros-grade{grid-template-columns:1fr}
+  .palco{position:static}
+}
+
 /* ---------- janelas ---------- */
 .fundo-janela{
   position:fixed;inset:0;z-index:120;background:rgba(43,40,34,.55);
@@ -413,6 +508,16 @@ textarea.transcricao:focus{outline:none;background:#fff;border-color:var(--amare
 .planilha-previa .corte{max-width:190px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
 .planilha-previa .marcar{width:34px;text-align:center}
 .planilha-previa input[type=checkbox]{width:15px;height:15px;accent-color:var(--amarelo);cursor:pointer}
+.escolher{width:34px;text-align:center}
+.escolher input{width:15px;height:15px;accent-color:var(--amarelo);cursor:pointer}
+.escolher input:disabled{cursor:not-allowed;opacity:.35}
+tr.escolhida{background:rgba(212,160,23,.09)}
+.barra-selecao{
+  display:flex;flex-wrap:wrap;align-items:center;gap:10px;
+  background:rgba(212,160,23,.12);border:1px solid rgba(212,160,23,.4);
+  border-radius:var(--raio-p);padding:9px 13px;margin-bottom:12px;font-size:.85rem;
+}
+.barra-selecao b{color:var(--amarelo-escuro)}
 .janela-topo{display:flex;align-items:flex-start;justify-content:space-between;gap:14px;margin-bottom:14px}
 .janela-titulo{font-size:1rem;font-weight:800}
 .fechar{
@@ -484,6 +589,10 @@ textarea.transcricao:focus{outline:none;background:#fff;border-color:var(--amare
         Marcas
       </button>
       <p class="grupo">minha rotina</p>
+      <button class="item" type="button" data-aba="prospeccao">
+        <svg viewBox="0 0 24 24"><rect x="2.5" y="5" width="19" height="14" rx="2"/><path d="M3 7l9 6 9-6"/></svg>
+        Prospecção
+      </button>
       <button class="item" type="button" data-aba="calendario">
         <svg viewBox="0 0 24 24"><rect x="3" y="5" width="18" height="16" rx="2"/><path d="M3 10h18M8 3v4M16 3v4"/></svg>
         Calendário
@@ -606,7 +715,7 @@ textarea.transcricao:focus{outline:none;background:#fff;border-color:var(--amare
      DADOS
      Tudo que falhar vira aviso na tela, nunca tela em branco.
      ===================================================================== */
-  const dados = { videos:[], marcas:[], calendario:[], campanhas:[], visitas:[], marcados:{}, transcricoes:[] };
+  const dados = { videos:[], marcas:[], calendario:[], campanhas:[], visitas:[], marcados:{}, transcricoes:[], envios:[], optout:[] };
   const avisos = [];
 
   function explicarErro(tabela, e){
@@ -648,14 +757,19 @@ textarea.transcricao:focus{outline:none;background:#fff;border-color:var(--amare
     if (faltando.length){
       const painelSQL = 'https://supabase.com/dashboard/project/' +
         String(window.BANCO.url).replace('https://','').split('.')[0] + '/sql/new';
+      /* cada tabela mora num arquivo diferente, então o recado
+         precisa mandar abrir o arquivo certo */
+      const doEmail = faltando.filter(function(t){ return t.indexOf('email_') === 0; });
+      const arquivo = doEmail.length === faltando.length ? 'disparo.sql'
+        : (doEmail.length ? 'banco.sql e o disparo.sql' : 'banco.sql');
       html +=
         '<b>Falta um passo: criar as tabelas no banco</b>' +
         '<p style="font-size:.85rem;margin-bottom:8px">É rápido e você faz uma vez só. ' +
         'Enquanto isso o painel funciona, só fica sem os seus dados.</p>' +
         '<ol style="font-size:.85rem;padding-left:18px;list-style:decimal">' +
-          '<li style="margin-bottom:4px">Abra o arquivo <b>banco.sql</b>, que está na pasta do seu projeto, e copie tudo (Cmd+A e depois Cmd+C).</li>' +
+          '<li style="margin-bottom:4px">Abra o arquivo <b>' + arquivo + '</b>, que está na pasta do seu projeto, e copie tudo (Cmd+A e depois Cmd+C).</li>' +
           '<li style="margin-bottom:4px">Clique no botão abaixo para abrir o editor de SQL do Supabase já na página certa.</li>' +
-          '<li style="margin-bottom:4px">Cole lá dentro e clique em <b>Run</b>. Deve aparecer uma tabelinha com seis linhas e a coluna rls_ligado toda em true.</li>' +
+          '<li style="margin-bottom:4px">Cole lá dentro e clique em <b>Run</b>. No fim aparece uma tabelinha com a coluna rls_ligado toda em true.</li>' +
           '<li>Volte aqui e recarregue esta página.</li>' +
         '</ol>' +
         '<p style="margin:10px 0 0"><a class="botao" href="' + painelSQL + '" target="_blank" rel="noopener" ' +
@@ -721,7 +835,9 @@ textarea.transcricao:focus{outline:none;background:#fff;border-color:var(--amare
       ler('campanhas', 'criado_em', false),
       ler('visitas', 'data', true),
       ler('marcados', null, true),
-      ler('transcricoes', 'criado_em', false)
+      ler('transcricoes', 'criado_em', false),
+      ler('email_envios', 'criado_em', false),
+      ler('email_optout', 'criado_em', false)
     ]);
     dados.videos     = resultado[0];
     dados.marcas     = resultado[1];
@@ -731,6 +847,8 @@ textarea.transcricao:focus{outline:none;background:#fff;border-color:var(--amare
     dados.marcados   = {};
     resultado[5].forEach(function(m){ if (m && m.marcado){ dados.marcados[m.chave] = true; } });
     dados.transcricoes = resultado[6];
+    dados.envios       = resultado[7];
+    dados.optout       = resultado[8];
 
     if (!window.Biblioteca){
       registrarAviso({ tipo:'outro', texto:'O arquivo js/biblioteca.js não carregou, então a aba Checklist vai aparecer vazia.' });
@@ -819,6 +937,7 @@ textarea.transcricao:focus{outline:none;background:#fff;border-color:var(--amare
     portfolio:  { titulo:'Portfólio',  sub:'Como o seu site está indo e os vídeos que aparecem nele.', desenhar: desenharPortfolio },
     marcas:     { titulo:'Marcas',     sub:'A sua base de contatos de empresa.',                      desenhar: desenharMarcas },
     calendario: { titulo:'Calendário', sub:'O que gravar, editar e postar em cada dia.',              desenhar: desenharCalendario },
+    prospeccao: { titulo:'Prospecção', sub:'Mandar o seu e-mail de apresentação para várias marcas de uma vez.', desenhar: desenharProspeccao },
     campanhas:  { titulo:'Campanhas',  sub:'Os trabalhos fechados, com valor, prazo e pagamento.',    desenhar: desenharCampanhas },
     transcricoes:{ titulo:'Transcrições', sub:'Os conteúdos que você gosta, com o roteiro salvo e as suas anotações.', desenhar: desenharTranscricoes },
     checklist:  { titulo:'Checklist',  sub:'O material de consulta para deixar o portfólio redondo.', desenhar: desenharChecklist }
@@ -1173,6 +1292,746 @@ textarea.transcricao:focus{outline:none;background:#fff;border-color:var(--amare
   }
 
   /* =====================================================================
+     ABA · PROSPECÇÃO
+     Os e-mails saem da tabela marcas, que já existe. Nada de
+     cadastro novo, nada de colar e-mail na mão.
+     ===================================================================== */
+  const EMAIL_CONTATO = window.BANCO.dona;
+  const NOME_REMETENTE = 'Lara Damasceno';
+  const RODAPE_SAIR = 'Se não quiser mais receber, responda este e-mail com SAIR.';
+
+  let pros = {
+    motor: 'resend',
+    destino: 'selecionadas',
+    modoTexto: true,
+    assunto: '',
+    texto: '',
+    htmlBruto: '',
+    botaoTexto: '',
+    botaoLink: '',
+    pularJaRecebeu: true,
+    buscaHistorico: '',
+    fila: null,
+    filaIndice: 0
+  };
+
+  function personalizar(texto, nomeDaMarca){
+    const completo = String(nomeDaMarca || '').trim();
+    const primeiro = completo.split(/\s+/)[0] || completo;
+    return String(texto || '').split('{{nome}}').join(primeiro).split('{{marca}}').join(completo);
+  }
+
+  /* transforma endereço solto em link clicável */
+  function linkar(t){
+    return t.replace(/(https?:\/\/[^\s<]+)/g, function(u){
+      return '<a href="' + u + '" style="color:#c74b34">' + u + '</a>';
+    });
+  }
+
+  /* monta o e-mail limpo a partir do texto simples que ela escreveu */
+  function montarEmailLimpo(texto, botaoTexto, botaoLink){
+    const paragrafos = String(texto || '').split(/\n{2,}/).map(function(p){
+      const corpo = linkar(escapar(p.trim()).split('\n').join('<br>'));
+      return corpo ? '<p style="margin:0 0 16px;font-size:15px;line-height:1.6;color:#2b2822">' + corpo + '</p>' : '';
+    }).join('');
+
+    const botao = (botaoTexto && botaoLink)
+      ? '<p style="margin:26px 0"><a href="' + escapar(botaoLink) + '" ' +
+        'style="display:inline-block;background:#c74b34;color:#ffffff;text-decoration:none;' +
+        'padding:13px 26px;border-radius:999px;font-weight:700;font-size:15px">' +
+        escapar(botaoTexto) + '</a></p>'
+      : '';
+
+    return '<div style="background:#ffffff;padding:26px 0;font-family:Helvetica,Arial,sans-serif">' +
+             '<div style="max-width:560px;margin:0 auto;padding:0 20px">' +
+               paragrafos + botao +
+               '<p style="margin:30px 0 0;padding-top:14px;border-top:1px solid #eeeae0;' +
+               'font-size:12px;line-height:1.5;color:#8d8779">' + RODAPE_SAIR + '</p>' +
+             '</div>' +
+           '</div>';
+  }
+
+  /* o html que vai sair, conforme o modo ligado na hora */
+  function htmlParaEnviar(){
+    return pros.modoTexto
+      ? montarEmailLimpo(pros.texto, pros.botaoTexto, pros.botaoLink)
+      : pros.htmlBruto;
+  }
+
+  /* tira as marcações para mostrar no modo rascunho e no Gmail */
+  function textoSimples(html){
+    return String(html || '')
+      /* no rascunho não existe botão clicável, então o endereço
+         precisa aparecer escrito, senão o link se perde */
+      .replace(/<a[^>]+href="([^"]+)"[^>]*>([\s\S]*?)<\/a>/gi, function(_t, endereco, texto){
+        const limpo = String(texto).replace(/<[^>]+>/g, '').trim();
+        return (limpo && limpo !== endereco) ? limpo + ': ' + endereco : endereco;
+      })
+      .replace(/<br\s*\/?>/gi, '\n')
+      .replace(/<\/p>/gi, '\n\n')
+      .replace(/<[^>]+>/g, '')
+      .replace(/&nbsp;/g, ' ').replace(/&amp;/g, '&')
+      .replace(/&lt;/g, '<').replace(/&gt;/g, '>').replace(/&#39;/g, "'").replace(/&quot;/g, '"')
+      .replace(/\n{3,}/g, '\n\n')
+      .trim();
+  }
+
+  /* as opções de destinatário, lidas da tabela marcas */
+  function opcoesDeDestino(){
+    const comEmail = dados.marcas.filter(function(m){ return (m.email || '').trim(); });
+    const selecionadas = comEmail.filter(function(m){ return m.selecionada; });
+
+    const opcoes = [
+      { v:'selecionadas', t:'só as marcas que eu selecionei (' + selecionadas.length + ')' },
+      { v:'teste',        t:'só para mim, para testar (1)' },
+      { v:'todas',        t:'todas as marcas com e-mail (' + comEmail.length + ')' }
+    ];
+
+    /* uma opção para cada situação que realmente existe no banco */
+    const situacoesNoBanco = [];
+    comEmail.forEach(function(m){
+      const sit = (m.situacao || '').trim();
+      if (sit && situacoesNoBanco.indexOf(sit) < 0){ situacoesNoBanco.push(sit); }
+    });
+    situacoesNoBanco.sort();
+    situacoesNoBanco.forEach(function(sit){
+      const quantas = comEmail.filter(function(m){ return m.situacao === sit; }).length;
+      opcoes.push({ v:'sit:' + sit, t:'só ' + rotuloSituacao(sit).toLowerCase() + ' (' + quantas + ')' });
+    });
+    return opcoes;
+  }
+
+  /* devolve a lista pronta, já sem repetir e-mail e sem descadastrados */
+  function listaDeDestino(){
+    const comEmail = dados.marcas.filter(function(m){ return (m.email || '').trim(); });
+    let base;
+    if (pros.destino === 'teste'){
+      return { lista:[{ email:EMAIL_CONTATO, nome:NOME_REMETENTE, id:null }], repetidos:0, pulados:0 };
+    }
+    if (pros.destino === 'selecionadas'){ base = comEmail.filter(function(m){ return m.selecionada; }); }
+    else if (pros.destino === 'todas'){ base = comEmail; }
+    else if (pros.destino.indexOf('sit:') === 0){
+      const sit = pros.destino.slice(4);
+      base = comEmail.filter(function(m){ return m.situacao === sit; });
+    } else { base = []; }
+
+    const foraDaLista = {};
+    dados.optout.forEach(function(o){ foraDaLista[String(o.email || '').toLowerCase().trim()] = true; });
+
+    const jaRecebeu = {};
+    if (pros.pularJaRecebeu){
+      dados.envios.forEach(function(e){
+        if (e.status === 'ok'){
+          jaRecebeu[String(e.email || '').toLowerCase() + '|' + String(e.assunto || '')] = true;
+        }
+      });
+    }
+
+    const vistos = {};
+    const lista = [];
+    let repetidos = 0, pulados = 0;
+
+    base.forEach(function(m){
+      const email = String(m.email || '').toLowerCase().trim();
+      if (!email){ return; }
+      if (vistos[email]){ repetidos++; return; }
+      vistos[email] = true;
+      if (foraDaLista[email]){ pulados++; return; }
+      if (pros.pularJaRecebeu && jaRecebeu[email + '|' + personalizar(pros.assunto, m.nome)]){ pulados++; return; }
+      lista.push({ email: email, nome: m.nome || '', id: m.id });
+    });
+
+    return { lista: lista, repetidos: repetidos, pulados: pulados };
+  }
+
+  function rotuloDoDestino(){
+    const o = opcoesDeDestino().filter(function(x){ return x.v === pros.destino; })[0];
+    return o ? o.t : pros.destino;
+  }
+
+  function desenharProspeccao(){
+    $('#acaoDaAba').innerHTML = '';
+
+    const comEmail = dados.marcas.filter(function(m){ return (m.email || '').trim(); });
+    const enviadosOk = dados.envios.filter(function(e){ return e.status === 'ok'; });
+    const comErro = dados.envios.filter(function(e){ return e.status === 'erro'; });
+    const jaReceberam = {};
+    enviadosOk.forEach(function(e){ jaReceberam[String(e.email || '').toLowerCase()] = true; });
+    const quantosJa = Object.keys(jaReceberam).length;
+
+    /* ---------- 1. a capa ---------- */
+    let html = '<div class="capa-pros">' +
+      '<div class="linha1">' +
+        '<span class="selo-icone"><svg viewBox="0 0 24 24"><rect x="2.5" y="5" width="19" height="14" rx="2"/><path d="M3 7l9 6 9-6"/></svg></span>' +
+        '<div>' +
+          '<h2>Prospecção</h2>' +
+          '<p>Manda o seu e-mail de apresentação para várias marcas de uma vez, chamando cada uma pelo nome.</p>' +
+        '</div>' +
+        '<div class="total">' +
+          '<div class="n">' + (dados.envios.length ? numero(enviadosOk.length) : '·') + '</div>' +
+          '<div class="r">enviados até agora</div>' +
+        '</div>' +
+      '</div>' +
+      '<div class="etiquetas">' +
+        '<span>teste antes, sempre</span>' +
+        '<span>a chave vive no Supabase</span>' +
+        '<span>quem responde SAIR sai da lista</span>' +
+      '</div>' +
+    '</div>';
+
+    /* ---------- 2. os cartões ---------- */
+    const semTabela = avisos.some(function(a){ return a.tipo === 'falta-tabela' && (a.tabela === 'email_envios' || a.tabela === 'email_optout'); });
+    html += '<div class="cartoes-pros">' +
+      cartaoNum(numero(comEmail.length), 'com e-mail na base', dados.marcas.length + ' marcas no total', '') +
+      cartaoNum(numero(Math.max(comEmail.length - quantosJa, 0)), 'a enviar', 'ainda não receberam nada', 'ambar') +
+      cartaoNum(semTabela ? '·' : numero(quantosJa), 'já receberam', semTabela ? 'falta criar a tabela' : 'pelo menos um e-mail', 'verde') +
+      cartaoNum(semTabela ? '·' : numero(comErro.length), 'falhas', 'e-mails que voltaram', 'vermelho') +
+      cartaoNum(semTabela ? '·' : numero(dados.optout.length), 'descadastrados', 'responderam SAIR', 'azul') +
+    '</div>';
+
+    /* ---------- base sem e-mail nenhum ---------- */
+    if (!comEmail.length){
+      html += '<div class="caixa"><p class="vazio">A sua base ainda não tem nenhuma marca com e-mail preenchido, ' +
+        'então não tem para quem mandar. Cadastre uma marca ou importe a sua planilha primeiro.</p>' +
+        '<div style="text-align:center;margin-top:12px">' +
+        '<button class="botao" type="button" id="irParaMarcas">ir para a aba Marcas</button></div></div>';
+      $('#painel').innerHTML = html;
+      $('#irParaMarcas').addEventListener('click', function(){ irPara('marcas'); });
+      return;
+    }
+
+    /* ---------- 3. formulário e prévia ---------- */
+    html += '<div class="pros-grade"><div>' + blocoFormulario() + '</div>' +
+            '<div>' + blocoPalco() + '</div></div>';
+
+    /* ---------- 4. histórico ---------- */
+    html += blocoHistorico();
+
+    $('#painel').innerHTML = html;
+    ligarProspeccao();
+  }
+
+  function ligarProspeccao(){
+    /* troca de modo de envio e de modo de escrita */
+    $$('[data-motor]').forEach(function(b){
+      b.addEventListener('click', function(){ pros.motor = b.dataset.motor; desenharProspeccao(); });
+    });
+    $$('[data-escrita]').forEach(function(b){
+      b.addEventListener('click', function(){ pros.modoTexto = b.dataset.escrita === 'texto'; desenharProspeccao(); });
+    });
+
+    $('#destinoPros').addEventListener('change', function(){
+      pros.destino = $('#destinoPros').value;
+      if (pros.destino === 'selecionadas' && !listaDeDestino().lista.length){
+        avisarSemSelecao();
+      }
+      desenharProspeccao();
+    });
+    $('#pularRecebidos').addEventListener('change', function(){
+      pros.pularJaRecebeu = $('#pularRecebidos').checked;
+      desenharProspeccao();
+    });
+
+    /* enquanto ela digita, só a prévia é redesenhada, senão o
+       cursor pula do campo a cada letra */
+    function ligarCampo(id, campo){
+      const el = $(id);
+      if (!el){ return; }
+      el.addEventListener('input', function(){ pros[campo] = el.value; atualizarPalco(); });
+    }
+    ligarCampo('#assuntoPros', 'assunto');
+    ligarCampo('#textoPros', 'texto');
+    ligarCampo('#htmlPros', 'htmlBruto');
+    ligarCampo('#botaoTextoPros', 'botaoTexto');
+    ligarCampo('#botaoLinkPros', 'botaoLink');
+
+    const btnModelo = $('#modeloPronto');
+    if (btnModelo){
+      btnModelo.addEventListener('click', function(){
+        pros.htmlBruto = montarEmailLimpo(
+          pros.texto || 'Oi {{nome}}, tudo bem?\n\nEscreva aqui o seu texto.\n\nUm abraço,\nLara',
+          pros.botaoTexto, pros.botaoLink);
+        desenharProspeccao();
+      });
+    }
+
+    ligarPalco();
+
+    const btnTeste = $('#enviarTeste');
+    if (btnTeste){ btnTeste.addEventListener('click', enviarTeste); }
+    const btnDisparar = $('#dispararPros');
+    if (btnDisparar){ btnDisparar.addEventListener('click', confirmarDisparo); }
+    const btnFila = $('#montarFila');
+    if (btnFila){ btnFila.addEventListener('click', montarFilaRascunho); }
+
+    const busca = $('#buscaHist');
+    if (busca){
+      busca.addEventListener('input', function(){
+        pros.buscaHistorico = busca.value;
+        const pos = busca.selectionStart;
+        desenharProspeccao();
+        const nova = $('#buscaHist');
+        if (nova){ nova.focus(); try{ nova.setSelectionRange(pos,pos); }catch(e){} }
+      });
+    }
+  }
+
+  function atualizarPalco(){
+    const palco = $('.palco');
+    if (!palco){ return; }
+    const novo = document.createElement('div');
+    novo.innerHTML = blocoPalco();
+    palco.replaceWith(novo.firstElementChild);
+    ligarPalco();
+  }
+
+  function ligarPalco(){
+    const btn = $('#verCheio');
+    if (!btn){ return; }
+    btn.addEventListener('click', function(){
+      const conta = listaDeDestino();
+      const exemplo = conta.lista[0] ? conta.lista[0].nome : 'Marca Exemplo';
+      const fundo = document.createElement('div');
+      fundo.className = 'fundo-cheio';
+      fundo.innerHTML = '<div class="cheio-janela">' + cabecaDoEmail(exemplo) +
+        '<div>' + personalizar(htmlParaEnviar(), exemplo) + '</div></div>' +
+        '<button class="fechar" style="position:fixed;top:18px;right:18px" aria-label="Fechar">×</button>';
+      document.body.appendChild(fundo);
+      function fechar(){ fundo.remove(); document.removeEventListener('keydown', tecla); }
+      function tecla(ev){ if (ev.key === 'Escape'){ fechar(); } }
+      fundo.addEventListener('mousedown', function(ev){ if (ev.target === fundo){ fechar(); } });
+      $('.fechar', fundo).addEventListener('click', fechar);
+      document.addEventListener('keydown', tecla);
+    });
+  }
+
+  function avisarSemSelecao(){
+    const fundo = abrirJanela('Nenhuma marca selecionada',
+      '<p style="font-size:.9rem">Você escolheu mandar só para as marcas selecionadas, mas não tem nenhuma marcada ainda.</p>' +
+      '<p style="font-size:.86rem;color:var(--tinta-suave)">Na aba Marcas, use a caixinha no começo de cada linha. ' +
+      'A seleção fica salva, então dá para marcar hoje e disparar amanhã.</p>' +
+      '<div class="janela-pe"><button class="botao claro" type="button" data-fechar>fechar</button>' +
+      '<button class="botao" type="button" id="vamosParaMarcas">ir para a aba Marcas</button></div>');
+    $('#vamosParaMarcas', fundo).addEventListener('click', function(){ fecharJanela(); irPara('marcas'); });
+  }
+
+  /* ---------- falar com o carteiro ---------- */
+  async function chamarCarteiro(destinatarios, assunto, html){
+    try{
+      const sessao = await sb.auth.getSession();
+      const token = sessao && sessao.data && sessao.data.session ? sessao.data.session.access_token : '';
+      const resposta = await fetch(window.BANCO.url + '/functions/v1/enviar-emails', {
+        method: 'POST',
+        headers: {
+          'Authorization': 'Bearer ' + token,
+          'apikey': window.BANCO.chave,
+          'Content-Type': 'application/json'
+        },
+        body: JSON.stringify({ destinatarios: destinatarios, assunto: assunto, html: html })
+      });
+      const corpo = await resposta.json().catch(function(){ return {}; });
+      return { ok: resposta.ok, corpo: corpo };
+    }catch(e){
+      return { ok:false, corpo:{ erro:'Não consegui falar com o carteiro. Confira se a função enviar-emails foi criada no Supabase.' } };
+    }
+  }
+
+  function conferirAntesDeMandar(){
+    if (!pros.assunto.trim()){ avisinho('Escreva o assunto primeiro.'); return false; }
+    const corpo = pros.modoTexto ? pros.texto.trim() : pros.htmlBruto.trim();
+    if (!corpo){ avisinho('Escreva o texto do e-mail primeiro.'); return false; }
+    return true;
+  }
+
+  async function enviarTeste(){
+    if (!conferirAntesDeMandar()){ return; }
+    const botao = $('#enviarTeste');
+    botao.disabled = true;
+    botao.textContent = 'mandando...';
+    const r = await chamarCarteiro(
+      [{ email: EMAIL_CONTATO, nome: NOME_REMETENTE }], pros.assunto, htmlParaEnviar());
+    botao.disabled = false;
+    botao.textContent = 'enviar teste para mim';
+
+    if (!r.ok || r.corpo.erro){
+      abrirJanela('Não deu para mandar o teste',
+        '<p style="font-size:.88rem">' + escapar(r.corpo.erro || 'O carteiro recusou.') + '</p>' +
+        '<div class="janela-pe"><button class="botao" type="button" data-fechar>fechar</button></div>');
+      $$('[data-fechar]').forEach(function(b){ b.addEventListener('click', fecharJanela); });
+      return;
+    }
+    await recarregarEnvios();
+    abrirJanela('Teste enviado',
+      '<p style="font-size:.9rem">Mandei para <b>' + escapar(EMAIL_CONTATO) + '</b>.</p>' +
+      '<p style="font-size:.86rem;color:var(--tinta-suave)">Abra no celular e confira se o nome da marca entrou ' +
+      'nos lugares certos antes de disparar para valer.</p>' +
+      '<div class="janela-pe"><button class="botao" type="button" data-fechar>fechar</button></div>');
+    $$('[data-fechar]').forEach(function(b){ b.addEventListener('click', fecharJanela); });
+    desenharProspeccao();
+  }
+
+  function confirmarDisparo(){
+    if (!conferirAntesDeMandar()){ return; }
+    const conta = listaDeDestino();
+
+    if (!conta.lista.length){
+      if (pros.destino === 'selecionadas'){ avisarSemSelecao(); }
+      else { avisinho('Não sobrou ninguém nessa lista.'); }
+      return;
+    }
+
+    /* no modo HTML o rodapé é responsabilidade dela */
+    const semSair = !pros.modoTexto && pros.htmlBruto.toUpperCase().indexOf('SAIR') < 0;
+
+    const fundo = abrirJanela('Confirmar o disparo',
+      '<p style="font-size:.95rem">Vai para <b>' + conta.lista.length + '</b> ' +
+      (conta.lista.length === 1 ? 'marca' : 'marcas') + ', da lista <b>' + escapar(rotuloDoDestino()) + '</b>.</p>' +
+      '<p style="font-size:.88rem;color:var(--tinta-suave)">Assunto: ' + escapar(pros.assunto) + '</p>' +
+      (semSair ? '<p class="tr-dica">O seu HTML não tem a palavra SAIR em lugar nenhum. ' +
+        'Sem o rodapé de descadastro, quem receber não tem como pedir para sair da lista.</p>' : '') +
+      '<p class="tr-dica" style="margin-top:10px">Depois de enviado não dá para desfazer.</p>' +
+      '<div class="janela-pe"><button class="botao claro" type="button" data-fechar>cancelar</button>' +
+      '<button class="botao" type="button" id="vaiAgora">sim, pode disparar</button></div>');
+    $('#vaiAgora', fundo).addEventListener('click', function(){ dispararTudo(conta.lista); });
+  }
+
+  async function dispararTudo(lista){
+    const assunto = pros.assunto;
+    const html = htmlParaEnviar();
+    const fundo = $('.fundo-janela');
+
+    $('.janela', fundo).innerHTML =
+      '<div class="janela-topo"><h2 class="janela-titulo">Disparando</h2></div>' +
+      '<p id="andaEnvio" style="font-size:.88rem">0 de ' + lista.length + '</p>' +
+      '<div class="trilho" style="margin-top:10px"><div class="cheio" id="barraEnvio" style="width:0%"></div></div>' +
+      '<p style="font-size:.78rem;color:var(--apagado);margin-top:10px">' +
+      'Vai devagar de propósito, cinco por segundo, que é o ritmo seguro. Não feche esta janela.</p>';
+
+    const pedaco = 100;
+    let enviados = 0, falhas = 0, pulados = 0, cotaAcabou = false, faltaram = 0, recado = '';
+    const idsEnviados = [];
+
+    for (let i = 0; i < lista.length; i += pedaco){
+      const lote = lista.slice(i, i + pedaco);
+      const r = await chamarCarteiro(lote.map(function(d){ return { email:d.email, nome:d.nome }; }), assunto, html);
+
+      if (!r.ok || r.corpo.erro){
+        recado = r.corpo.erro || 'O carteiro recusou o envio.';
+        break;
+      }
+      enviados += r.corpo.enviados || 0;
+      falhas   += r.corpo.falhas || 0;
+      pulados  += r.corpo.pulados || 0;
+      lote.forEach(function(d){ if (d.id){ idsEnviados.push(d.id); } });
+
+      if (r.corpo.cotaAcabou){
+        cotaAcabou = true;
+        faltaram = (r.corpo.faltaram || 0) + (lista.length - Math.min(i + pedaco, lista.length));
+        break;
+      }
+      const feito = Math.min(i + pedaco, lista.length);
+      $('#andaEnvio').textContent = feito + ' de ' + lista.length;
+      $('#barraEnvio').style.width = Math.round((feito / lista.length) * 100) + '%';
+    }
+
+    /* marca na tabela de marcas quem recebeu, com a data de hoje */
+    if (idsEnviados.length){
+      const hojeTexto = iso(hoje());
+      for (let i = 0; i < idsEnviados.length; i += 25){
+        const lote = idsEnviados.slice(i, i + 25);
+        await Promise.all(lote.map(function(id){
+          return sb.from('marcas').update({ enviado_em: hojeTexto }).eq('id', id)
+            .then(function(){
+              const m = dados.marcas.filter(function(x){ return x.id === id; })[0];
+              if (m){ m.enviado_em = hojeTexto; }
+            }, function(){});
+        }));
+      }
+    }
+
+    await recarregarEnvios();
+
+    let fim = '<div class="janela-topo"><h2 class="janela-titulo">' +
+      (recado ? 'O disparo parou' : 'Disparo terminado') + '</h2></div>';
+
+    if (recado){
+      fim += '<p class="tr-dica">' + escapar(recado) + '</p>';
+    }
+    fim += '<div class="faixa-numeros" style="margin:12px 0;border:0">' +
+      bloco(numero(enviados), 'enviados') +
+      bloco(numero(falhas), 'falhas') +
+      bloco(numero(pulados), 'pulados') +
+    '</div>';
+
+    if (cotaAcabou){
+      fim += '<p class="tr-dica"><b>A cota diária do Resend acabou.</b> ' +
+        'Faltaram ' + faltaram + '. Volte amanhã, cole o mesmo assunto e o mesmo texto, ' +
+        'deixe marcada a caixinha de pular quem já recebeu, e ele manda só para os que ficaram faltando.</p>';
+    }
+
+    fim += '<div class="janela-pe">' +
+      (pros.destino === 'selecionadas'
+        ? '<button class="botao claro" type="button" id="limparDepois">limpar a minha seleção</button>' : '') +
+      '<button class="botao" type="button" data-fechar>fechar</button></div>';
+
+    $('.janela', fundo).innerHTML = fim;
+    $$('[data-fechar]', fundo).forEach(function(b){ b.addEventListener('click', fecharJanela); });
+    const btnLimpar = $('#limparDepois', fundo);
+    if (btnLimpar){
+      btnLimpar.addEventListener('click', async function(){
+        const alvo = dados.marcas.filter(function(m){ return m.selecionada; });
+        btnLimpar.disabled = true;
+        btnLimpar.textContent = 'limpando...';
+        await mudarSelecao(alvo, false);
+        fecharJanela();
+        desenharProspeccao();
+      });
+    }
+    desenharProspeccao();
+  }
+
+  async function recarregarEnvios(){
+    dados.envios = await ler('email_envios', 'criado_em', false);
+  }
+
+  /* ---------- modo rascunho, o plano B sem Resend ---------- */
+  function montarFilaRascunho(){
+    if (!conferirAntesDeMandar()){ return; }
+    const conta = listaDeDestino();
+    if (!conta.lista.length){
+      if (pros.destino === 'selecionadas'){ avisarSemSelecao(); }
+      else { avisinho('Não sobrou ninguém nessa lista.'); }
+      return;
+    }
+    pros.fila = conta.lista;
+    pros.filaIndice = 0;
+    desenharFila();
+  }
+
+  function desenharFila(){
+    const restam = pros.fila.length;
+    if (!restam){
+      $('#painel').innerHTML = '<div class="caixa"><p class="vazio">Fila vazia, você mandou todas. ' +
+        'Cada uma já ficou marcada como enviada na sua base.</p>' +
+        '<div style="text-align:center;margin-top:12px">' +
+        '<button class="botao" type="button" id="voltarPros">voltar para a prospecção</button></div></div>';
+      $('#voltarPros').addEventListener('click', function(){ pros.fila = null; desenharProspeccao(); });
+      return;
+    }
+
+    const d = pros.fila[0];
+    const assunto = personalizar(pros.assunto, d.nome);
+    const corpoHtml = personalizar(htmlParaEnviar(), d.nome);
+    const corpoTexto = textoSimples(corpoHtml);
+    const linkGmail = 'https://mail.google.com/mail/?view=cm&fs=1' +
+      '&to=' + encodeURIComponent(d.email) +
+      '&su=' + encodeURIComponent(assunto) +
+      '&body=' + encodeURIComponent(corpoTexto);
+
+    $('#painel').innerHTML =
+      '<div class="caixa"><div style="display:flex;align-items:center;gap:10px;flex-wrap:wrap">' +
+        '<p class="caixa-titulo" style="margin:0">fila de rascunhos · faltam ' + restam + '</p>' +
+        '<span style="flex:1"></span>' +
+        '<button class="chip" type="button" id="pularEsta">pular esta</button>' +
+        '<button class="chip" type="button" id="sairDaFila">sair da fila</button>' +
+      '</div></div>' +
+      '<div class="fila-item">' +
+        '<h4>' + escapar(d.nome || 'sem nome') + '</h4>' +
+        '<p class="para">para ' + escapar(d.email) + '</p>' +
+        '<p style="font-size:.86rem;font-weight:700;margin:12px 0 0">' + escapar(assunto) + '</p>' +
+        '<div class="fila-corpo">' + escapar(corpoTexto) + '</div>' +
+        '<div style="display:flex;gap:8px;flex-wrap:wrap">' +
+          '<button class="botao claro" type="button" id="copiarCorpo">copiar o texto</button>' +
+          '<a class="botao claro" href="' + escapar(linkGmail) + '" target="_blank" rel="noopener" ' +
+            'style="text-decoration:none">abrir no Gmail</a>' +
+          '<button class="botao" type="button" id="marcarEnviada">marquei como enviada</button>' +
+        '</div>' +
+      '</div>';
+
+    $('#pularEsta').addEventListener('click', function(){ pros.fila.shift(); desenharFila(); });
+    $('#sairDaFila').addEventListener('click', function(){ pros.fila = null; desenharProspeccao(); });
+    $('#copiarCorpo').addEventListener('click', function(){
+      copiarParaAreaDeTransferencia(corpoTexto, true);
+    });
+    $('#marcarEnviada').addEventListener('click', async function(){
+      const botao = $('#marcarEnviada');
+      botao.disabled = true;
+      botao.textContent = 'anotando...';
+      const hojeTexto = iso(hoje());
+      try{
+        await sb.from('email_envios').insert({
+          email: d.email, assunto: assunto, status: 'ok', erro: '', resend_id: 'rascunho'
+        });
+      }catch(e){}
+      if (d.id){
+        try{
+          await sb.from('marcas').update({ enviado_em: hojeTexto }).eq('id', d.id);
+          const m = dados.marcas.filter(function(x){ return x.id === d.id; })[0];
+          if (m){ m.enviado_em = hojeTexto; }
+        }catch(e){}
+      }
+      await recarregarEnvios();
+      pros.fila.shift();
+      desenharFila();
+    });
+  }
+
+  function cartaoNum(n, r, sub, cor){
+    return '<div class="cartao-num ' + (cor || '') + '">' +
+      '<div class="n">' + escapar(n) + '</div>' +
+      '<div class="r">' + escapar(r) + '</div>' +
+      (sub ? '<div class="sub">' + escapar(sub) + '</div>' : '') + '</div>';
+  }
+
+  function blocoFormulario(){
+    const conta = listaDeDestino();
+    const semEmail = dados.marcas.length - dados.marcas.filter(function(m){ return (m.email || '').trim(); }).length;
+
+    let html = '<div class="caixa">' +
+      '<p class="caixa-titulo">como vou mandar</p>' +
+      '<div class="modos">' +
+        '<button class="chip" type="button" data-motor="resend" aria-pressed="' + (pros.motor==='resend') + '">automático, pelo Resend</button>' +
+        '<button class="chip" type="button" data-motor="rascunho" aria-pressed="' + (pros.motor==='rascunho') + '">rascunho, eu mesma envio</button>' +
+      '</div>' +
+      (pros.motor === 'rascunho'
+        ? '<p class="aviso-origem">No modo rascunho nada é enviado sozinho. O painel monta o e-mail de cada marca, ' +
+          'já com o nome dela dentro, e você manda pelo seu Gmail, uma por vez. Funciona sem configurar nada.</p>'
+        : '<p class="aviso-origem">No modo automático o disparo sai sozinho. Enquanto você não tiver um domínio ' +
+          'verificado no Resend, ele só consegue entregar para o seu próprio e-mail.</p>') +
+    '</div>';
+
+    html += '<div class="caixa">' +
+      '<p class="caixa-titulo">para quem vai</p>' +
+      '<p class="aviso-origem">os e-mails vêm da sua aba Marcas</p>' +
+      '<div class="campo"><select id="destinoPros">' +
+        opcoesDeDestino().map(function(o){
+          return '<option value="' + escapar(o.v) + '"' + (pros.destino === o.v ? ' selected' : '') + '>' + escapar(o.t) + '</option>';
+        }).join('') +
+      '</select></div>' +
+      '<p style="font-size:.85rem"><b>' + conta.lista.length + '</b> ' +
+        (conta.lista.length === 1 ? 'marca vai receber' : 'marcas vão receber') +
+        (conta.repetidos ? ' · ' + conta.repetidos + ' com e-mail repetido, mando uma vez só' : '') +
+        (conta.pulados ? ' · ' + conta.pulados + ' puladas' : '') +
+        (semEmail ? ' · ' + semEmail + (semEmail === 1 ? ' ficou' : ' ficaram') + ' de fora por não ter e-mail' : '') +
+      '</p>' +
+      '<label class="item-cl" style="border:0;padding:8px 0 0;cursor:pointer">' +
+        '<input type="checkbox" id="pularRecebidos"' + (pros.pularJaRecebeu ? ' checked' : '') + '>' +
+        '<span><span class="t">pular quem já recebeu este mesmo assunto</span>' +
+        '<span class="d" style="display:block">serve para continuar um disparo que parou no meio</span></span>' +
+      '</label>' +
+    '</div>';
+
+    html += '<div class="caixa">' +
+      '<p class="caixa-titulo">o e-mail</p>' +
+      '<div class="modos">' +
+        '<button class="chip" type="button" data-escrita="texto" aria-pressed="' + (pros.modoTexto) + '">texto fácil</button>' +
+        '<button class="chip" type="button" data-escrita="html" aria-pressed="' + (!pros.modoTexto) + '">HTML</button>' +
+      '</div>' +
+      '<div class="campo"><label for="assuntoPros">assunto</label>' +
+        '<input type="text" id="assuntoPros" value="' + escapar(pros.assunto) + '" ' +
+        'placeholder="Parceria com a {{marca}}"></div>';
+
+    if (pros.modoTexto){
+      html += '<div class="campo"><label for="textoPros">o texto do e-mail</label>' +
+        '<textarea class="email-texto" id="textoPros" placeholder="Oi {{nome}}, tudo bem?&#10;&#10;Escreva aqui do seu jeito. Use {{nome}} para o primeiro nome da marca e {{marca}} para o nome completo.">' +
+        escapar(pros.texto) + '</textarea>' +
+        '<span style="display:block;font-size:.76rem;color:var(--apagado);margin-top:5px">' +
+        'Escreva normal. Linha em branco separa parágrafo, e link vira clicável sozinho.</span></div>' +
+        '<div class="dupla">' +
+          campoTexto('botaoTextoPros','texto do botão (opcional)', pros.botaoTexto) +
+          campoTexto('botaoLinkPros','link do botão', pros.botaoLink, 'url') +
+        '</div>';
+    } else {
+      html += '<div class="campo">' +
+        '<div style="display:flex;align-items:center;gap:8px;margin-bottom:5px">' +
+          '<label for="htmlPros" style="margin:0">o HTML do e-mail</label>' +
+          '<span style="flex:1"></span>' +
+          '<button class="botao claro" type="button" id="modeloPronto" style="padding:4px 12px;font-size:.76rem">começar do modelo pronto</button>' +
+        '</div>' +
+        '<textarea class="email-codigo" id="htmlPros" placeholder="Cole aqui o HTML do e-mail. O {{nome}} e o {{marca}} continuam funcionando.">' +
+        escapar(pros.htmlBruto) + '</textarea>' +
+        '<span style="display:block;font-size:.76rem;color:var(--apagado);margin-top:5px">' +
+        'Neste modo sai exatamente o que você colar. O rodapé do SAIR precisa estar no seu HTML.</span></div>';
+    }
+
+    html += '<div class="janela-pe" style="justify-content:flex-start">' +
+      (pros.motor === 'resend'
+        ? '<button class="botao claro" type="button" id="enviarTeste">enviar teste para mim</button>' +
+          '<button class="botao" type="button" id="dispararPros">disparar</button>'
+        : '<button class="botao" type="button" id="montarFila">montar a fila de rascunhos</button>') +
+      '</div></div>';
+
+    return html;
+  }
+
+  function blocoPalco(){
+    const conta = listaDeDestino();
+    const exemplo = conta.lista[0] ? conta.lista[0].nome : 'Marca Exemplo';
+    return '<div class="palco">' +
+      '<div class="palco-topo">' +
+        '<p class="caixa-titulo" style="margin:0">como vai chegar</p>' +
+        '<span style="flex:1"></span>' +
+        '<button class="chip" type="button" id="verCheio">ver em tela cheia</button>' +
+      '</div>' +
+      '<div class="janela-email">' + cabecaDoEmail(exemplo) +
+        '<div class="email-corpo">' + personalizar(htmlParaEnviar(), exemplo) + '</div>' +
+      '</div>' +
+      '<p class="nota-previa">Antes de disparar, mande o teste para você mesma e abra no celular.</p>' +
+    '</div>';
+  }
+
+  function cabecaDoEmail(exemplo){
+    return '<div class="email-cabeca">' +
+      '<span class="email-avatar">' + escapar(NOME_REMETENTE.charAt(0)) + '</span>' +
+      '<span><span class="email-assunto" style="display:block">' +
+        escapar(personalizar(pros.assunto, exemplo) || 'o seu assunto aparece aqui') + '</span>' +
+        '<span class="email-de" style="display:block">' + escapar(NOME_REMETENTE) + ' &lt;' +
+        escapar(EMAIL_CONTATO) + '&gt; para você</span></span>' +
+    '</div>';
+  }
+
+  function blocoHistorico(){
+    const busca = semAcento(pros.buscaHistorico);
+    const lista = dados.envios.filter(function(e){
+      if (!busca){ return true; }
+      return semAcento((e.email || '') + ' ' + (e.assunto || '')).indexOf(busca) >= 0;
+    });
+
+    let html = '<div class="caixa" style="margin-top:18px">' +
+      '<div style="display:flex;align-items:center;gap:10px;flex-wrap:wrap;margin-bottom:10px">' +
+        '<p class="caixa-titulo" style="margin:0">tudo que já saiu</p>' +
+        '<span style="flex:1"></span>' +
+        '<input class="busca" id="buscaHist" type="search" placeholder="buscar por e-mail ou assunto" ' +
+        'value="' + escapar(pros.buscaHistorico) + '" style="max-width:260px">' +
+      '</div>';
+
+    if (!dados.envios.length){
+      html += '<p class="vazio">Nenhum e-mail saiu ainda. Quando o primeiro disparo acontecer, cada destinatário ' +
+        'vira uma linha aqui, com a data e se deu certo. É isso que te permite saber quem recebeu se um disparo parar no meio.</p>';
+    } else if (!lista.length){
+      html += '<p class="vazio">Nenhum envio com essa busca.</p>';
+    } else {
+      html += '<div class="planilha-previa"><table><thead><tr>' +
+        '<th>quando</th><th>para quem</th><th>assunto</th><th>deu certo</th><th>erro</th>' +
+        '</tr></thead><tbody>' +
+        lista.slice(0, 400).map(function(e){
+          const d = e.criado_em ? new Date(e.criado_em) : null;
+          return '<tr>' +
+            '<td>' + (d ? String(d.getDate()).padStart(2,'0') + '/' + String(d.getMonth()+1).padStart(2,'0') + ' ' +
+                        String(d.getHours()).padStart(2,'0') + ':' + String(d.getMinutes()).padStart(2,'0') : '·') + '</td>' +
+            '<td>' + escapar(e.email) + '</td>' +
+            '<td class="corte" title="' + escapar(e.assunto) + '">' + escapar(e.assunto) + '</td>' +
+            '<td><span class="pilula p-' + (e.status === 'ok' ? 'cliente' : 'parada') + '">' +
+              (e.status === 'ok' ? 'sim' : 'não') + '</span></td>' +
+            '<td class="corte" title="' + escapar(e.erro) + '">' + escapar(e.erro || '·') + '</td>' +
+          '</tr>';
+        }).join('') + '</tbody></table></div>' +
+        '<p style="margin-top:9px;font-size:.78rem;color:var(--apagado)">' + lista.length + ' de ' + dados.envios.length + ' envios.</p>';
+    }
+    return html + '</div>';
+  }
+
+  /* =====================================================================
      ABA 2 · MARCAS
      ===================================================================== */
   /* Os nichos das marcas. São os mesmos nomes usados nos vídeos,
@@ -1296,6 +2155,21 @@ textarea.transcricao:focus{outline:none;background:#fff;border-color:var(--amare
         }).join('') +
       '</select></div>';
 
+    const selecionadas = dados.marcas.filter(function(m){ return m.selecionada; });
+    const daListaComEmail = lista.filter(function(m){ return (m.email || '').trim(); });
+
+    if (selecionadas.length || daListaComEmail.length){
+      html += '<div class="barra-selecao">' +
+        '<span><b>' + selecionadas.length + '</b> ' +
+        (selecionadas.length === 1 ? 'marca selecionada' : 'marcas selecionadas') +
+        ' para o disparo</span>' +
+        '<span style="flex:1"></span>' +
+        '<button class="chip" type="button" id="selecionarVisiveis">selecionar as ' +
+          daListaComEmail.length + ' que estão aparecendo</button>' +
+        (selecionadas.length ? '<button class="chip" type="button" id="limparSelecao">limpar seleção</button>' : '') +
+      '</div>';
+    }
+
     html += '<div class="caixa">';
     if (!dados.marcas.length){
       html += '<p class="vazio">A sua base de contatos está vazia. Clique em "+ nova marca" para cadastrar a primeira, ' +
@@ -1304,6 +2178,7 @@ textarea.transcricao:focus{outline:none;background:#fff;border-color:var(--amare
       html += '<p class="vazio">Nenhuma marca com esse filtro. Tente limpar a busca.</p>';
     } else {
       html += '<div class="rolagem"><table><thead><tr>' +
+        '<th class="escolher"></th>' +
         '<th style="width:34px"></th>' +
         '<th>marca</th><th>nicho</th><th>instagram</th><th>e-mail</th><th>telefone</th>' +
         '<th>situação</th><th>observação</th><th>último contato</th><th></th>' +
@@ -1313,8 +2188,14 @@ textarea.transcricao:focus{outline:none;background:#fff;border-color:var(--amare
           const arroba = String(m.instagram || '').replace('@','').trim();
           const ultimaFixada = m.favorita && !soFavoritas &&
             lista[lista.indexOf(m) + 1] && !lista[lista.indexOf(m) + 1].favorita;
+          const temEmail = !!(m.email || '').trim();
           return '<tr class="clicavel' + (m.favorita ? ' favorita' : '') +
+                 (m.selecionada ? ' escolhida' : '') +
                  (ultimaFixada ? ' ultima-fixada' : '') + '" data-marca="' + m.id + '">' +
+            '<td class="escolher"><input type="checkbox" data-escolher="' + m.id + '"' +
+              (m.selecionada ? ' checked' : '') + (temEmail ? '' : ' disabled') + ' data-parar ' +
+              'title="' + (temEmail ? 'incluir no próximo disparo' : 'esta marca não tem e-mail cadastrado') + '" ' +
+              'aria-label="incluir no próximo disparo"></td>' +
             '<td><button class="estrela ' + (m.favorita ? 'marcada' : '') + '" type="button" ' +
               'data-fixar="' + m.id + '" data-parar aria-label="' +
               (m.favorita ? 'Tirar do topo' : 'Fixar no topo') + '" title="' +
@@ -1373,6 +2254,49 @@ textarea.transcricao:focus{outline:none;background:#fff;border-color:var(--amare
         formMarca(m);
       });
     });
+    /* a caixinha grava na hora, então a seleção sobrevive a
+       fechar o painel e voltar amanhã */
+    $$('[data-escolher]').forEach(function(ck){
+      ck.addEventListener('click', function(ev){ ev.stopPropagation(); });
+      ck.addEventListener('change', async function(){
+        const m = dados.marcas.filter(function(x){ return String(x.id) === ck.dataset.escolher; })[0];
+        if (!m){ return; }
+        const novo = ck.checked;
+        const r = await gravar('marcas', { id:m.id, selecionada:novo });
+        if (r.ok){
+          m.selecionada = novo;
+          const tr = ck.closest('tr');
+          if (tr){ tr.classList.toggle('escolhida', novo); }
+          const barra = $('.barra-selecao b');
+          if (barra){ barra.textContent = dados.marcas.filter(function(x){ return x.selecionada; }).length; }
+        } else {
+          ck.checked = !novo;
+        }
+      });
+    });
+
+    const btnTodas = $('#selecionarVisiveis');
+    if (btnTodas){
+      btnTodas.addEventListener('click', async function(){
+        const alvo = daListaComEmail.filter(function(m){ return !m.selecionada; });
+        if (!alvo.length){ avisinho('Todas as que estão aparecendo já estão selecionadas.'); return; }
+        btnTodas.disabled = true;
+        btnTodas.textContent = 'selecionando...';
+        await mudarSelecao(alvo, true);
+        desenharMarcas();
+      });
+    }
+    const btnLimpar = $('#limparSelecao');
+    if (btnLimpar){
+      btnLimpar.addEventListener('click', function(){
+        const alvo = dados.marcas.filter(function(m){ return m.selecionada; });
+        confirmar('Limpar a seleção de ' + alvo.length + (alvo.length === 1 ? ' marca' : ' marcas') + '?', async function(){
+          await mudarSelecao(alvo, false);
+          desenharMarcas();
+        });
+      });
+    }
+
     $$('[data-fixar]').forEach(function(b){
       b.addEventListener('click', async function(ev){
         ev.stopPropagation();
@@ -1401,6 +2325,28 @@ textarea.transcricao:focus{outline:none;background:#fff;border-color:var(--amare
         });
       });
     });
+  }
+
+  /* muda a seleção de várias marcas de uma vez, em lotes, para
+     não abrir trezentas conversas com o banco ao mesmo tempo */
+  async function mudarSelecao(marcas, valor){
+    const pedaco = 25;
+    let erros = 0;
+    for (let i = 0; i < marcas.length; i += pedaco){
+      const lote = marcas.slice(i, i + pedaco);
+      await Promise.all(lote.map(function(m){
+        return sb.from('marcas').update({ selecionada: valor }).eq('id', m.id)
+          .then(function(r){
+            if (r.error){ erros++; return; }
+            m.selecionada = valor;
+          }, function(){ erros++; });
+      }));
+    }
+    if (erros){
+      avisinho('Não consegui salvar ' + erros + '. Se a coluna selecionada ainda não existe, rode o disparo.sql.');
+    } else {
+      avisinho(valor ? 'Marcas selecionadas.' : 'Seleção limpa.');
+    }
   }
 
   function rotuloSituacao(v){
