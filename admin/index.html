@@ -396,6 +396,20 @@ textarea.transcricao:focus{outline:none;background:#fff;border-color:var(--amare
   padding:20px 22px;box-shadow:0 24px 60px rgba(43,40,34,.3);
 }
 .janela.larga{max-width:640px}
+.janela.muito-larga{max-width:1020px}
+.planilha-previa{max-height:44vh;overflow:auto;border:1px solid var(--borda);border-radius:var(--raio-p)}
+.planilha-previa table{font-size:.8rem}
+.planilha-previa thead th{
+  position:sticky;top:0;z-index:2;background:var(--papel);
+  box-shadow:inset 0 -1px 0 var(--borda);padding:7px 9px;
+}
+.planilha-previa td{padding:6px 9px}
+.planilha-previa .num{color:var(--apagado);font-size:.72rem;text-align:right;width:44px}
+.planilha-previa tr.repetida td{opacity:.5}
+.planilha-previa tr.fora td:not(.marcar){opacity:.4;text-decoration:line-through}
+.planilha-previa .corte{max-width:190px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.planilha-previa .marcar{width:34px;text-align:center}
+.planilha-previa input[type=checkbox]{width:15px;height:15px;accent-color:var(--amarelo);cursor:pointer}
 .janela-topo{display:flex;align-items:flex-start;justify-content:space-between;gap:14px;margin-bottom:14px}
 .janela-titulo{font-size:1rem;font-weight:800}
 .fechar{
@@ -1456,6 +1470,7 @@ textarea.transcricao:focus{outline:none;background:#fff;border-color:var(--amare
 
   function janelaImportar(){
     const fundo = abrirJanela('Importar a sua planilha de leads', '<div id="passoImportar"></div>', true);
+    $('.janela', fundo).classList.add('muito-larga');
     passoEscolherArquivo(fundo);
   }
 
@@ -1504,6 +1519,7 @@ textarea.transcricao:focus{outline:none;background:#fff;border-color:var(--amare
     const cabecalho = linhas[0].map(function(c){ return String(c).trim(); });
     const corpo = linhas.slice(1);
     let mapa = adivinharColunas(cabecalho);
+    let desmarcadas = {};
 
     function desenharConferencia(){
       const opcoesColuna = [{ v:'', t:'não importar' }].concat(cabecalho.map(function(c,i){
@@ -1531,32 +1547,59 @@ textarea.transcricao:focus{outline:none;background:#fff;border-color:var(--amare
       const novas = prontas.filter(function(x){ return !x.repetida; });
       const repetidas = prontas.length - novas.length;
 
-      html += '<div class="caixa" style="margin-top:14px"><p class="caixa-titulo">como as três primeiras vão entrar</p>';
-      if (!novas.length){
-        html += '<p class="vazio">Nenhuma linha nova para importar. Confira se a coluna da marca está apontada certo.</p>';
+      html += '<div class="caixa" style="margin-top:14px">' +
+        '<div style="display:flex;align-items:center;gap:10px;flex-wrap:wrap;margin-bottom:10px">' +
+          '<p class="caixa-titulo" style="margin:0">confira linha por linha antes de importar</p>' +
+          '<span style="flex:1"></span>' +
+          '<button class="chip" type="button" id="marcarTodas">marcar todas</button>' +
+          '<button class="chip" type="button" id="desmarcarTodas">desmarcar todas</button>' +
+        '</div>';
+
+      if (!prontas.length){
+        html += '<p class="vazio">Nenhuma linha aproveitável. Confira se a coluna da marca está apontada certo.</p>';
       } else {
-        html += '<div class="rolagem"><table><thead><tr><th>marca</th><th>instagram</th><th>e-mail</th><th>telefone</th><th>situação</th></tr></thead><tbody>' +
-          novas.slice(0,3).map(function(m){
-            return '<tr><td><strong>' + escapar(m.nome || 'sem nome') + '</strong></td>' +
+        html += '<div class="planilha-previa"><table><thead><tr>' +
+          '<th class="marcar"></th><th class="num">#</th>' +
+          '<th>marca</th><th>instagram</th><th>e-mail</th><th>telefone</th>' +
+          '<th>situação</th><th>observação</th><th>último contato</th>' +
+          '</tr></thead><tbody>' +
+          prontas.map(function(m, i){
+            const fora = !m.repetida && desmarcadas[i];
+            return '<tr class="' + (m.repetida ? 'repetida' : (fora ? 'fora' : '')) + '">' +
+              '<td class="marcar">' +
+                (m.repetida
+                  ? '<span title="já está na sua base" style="color:var(--apagado)">·</span>'
+                  : '<input type="checkbox" data-linha="' + i + '"' + (fora ? '' : ' checked') + ' aria-label="importar esta linha">') +
+              '</td>' +
+              '<td class="num">' + (i+1) + '</td>' +
+              '<td><strong>' + escapar(m.nome || 'sem nome') + '</strong>' +
+                (m.repetida ? ' <span class="pilula p-parada">já existe</span>' : '') + '</td>' +
               '<td>' + escapar(m.instagram || '·') + '</td>' +
-              '<td>' + escapar(m.email || '·') + '</td>' +
+              '<td class="corte" title="' + escapar(m.email) + '">' + escapar(m.email || '·') + '</td>' +
               '<td>' + escapar(m.telefone || '·') + '</td>' +
-              '<td><span class="pilula p-' + escapar(m.situacao) + '">' + escapar(rotuloSituacao(m.situacao)) + '</span></td></tr>';
-          }).join('') + '</tbody></table></div>';
+              '<td><span class="pilula p-' + escapar(m.situacao) + '">' + escapar(rotuloSituacao(m.situacao)) + '</span></td>' +
+              '<td class="corte" title="' + escapar(m.obs) + '">' + escapar(m.obs || '·') + '</td>' +
+              '<td>' + escapar(m.ultimo_contato ? dataCurta(m.ultimo_contato) : '·') + '</td>' +
+            '</tr>';
+          }).join('') + '</tbody></table></div>' +
+          '<p style="margin-top:9px;font-size:.78rem;color:var(--apagado)">' +
+          prontas.length + ' linhas lidas · ' + novas.length + ' novas · ' + repetidas + ' já na sua base. ' +
+          'Desmarque qualquer linha que você não quiser importar.</p>';
       }
       html += '</div>';
 
       if (repetidas > 0){
-        html += '<p class="tr-dica" style="margin-top:12px">Encontrei <b>' + repetidas + '</b> ' +
-          (repetidas === 1 ? 'linha que já está' : 'linhas que já estão') +
-          ' na sua base, pelo e-mail, pelo @ ou pelo nome. ' +
-          (repetidas === 1 ? 'Ela não entra' : 'Elas não entram') + ' de novo, para não duplicar.</p>';
+        html += '<p class="tr-dica" style="margin-top:12px">As <b>' + repetidas + '</b> ' +
+          (repetidas === 1 ? 'linha marcada como "já existe" foi encontrada' : 'linhas marcadas como "já existe" foram encontradas') +
+          ' na sua base pelo e-mail, pelo @ ou pelo nome, e não ' +
+          (repetidas === 1 ? 'entra' : 'entram') + ' de novo para não duplicar.</p>';
       }
 
+      const quantasVao = novas.filter(function(_m, i){ return !desmarcadas[prontas.indexOf(_m)]; }).length;
       html += '<div class="janela-pe">' +
         '<button class="botao claro" type="button" id="voltarEscolher">voltar</button>' +
-        '<button class="botao" type="button" id="confirmarImportar"' + (novas.length ? '' : ' disabled') + '>' +
-        'importar ' + novas.length + (novas.length === 1 ? ' marca' : ' marcas') + '</button></div>';
+        '<button class="botao" type="button" id="confirmarImportar"' + (quantasVao ? '' : ' disabled') + '>' +
+        'importar <span id="quantasVao">' + quantasVao + '</span> marcas</button></div>';
 
       $('#passoImportar', fundo).innerHTML = html;
 
@@ -1568,13 +1611,48 @@ textarea.transcricao:focus{outline:none;background:#fff;border-color:var(--amare
           });
           if (valor === ''){ delete mapa[sel.dataset.campo]; }
           else { mapa[sel.dataset.campo] = Number(valor); }
+          desmarcadas = {};
           desenharConferencia();
         });
       });
       $('#voltarEscolher', fundo).addEventListener('click', function(){ passoEscolherArquivo(fundo); });
+
+      /* marcar e desmarcar não redesenha a tabela inteira, senão a
+         rolagem volta para o começo a cada clique */
+      function atualizarConta(){
+        const escolhidas = prontas.filter(function(m, i){ return !m.repetida && !desmarcadas[i]; });
+        const alvo = $('#quantasVao', fundo);
+        if (alvo){ alvo.textContent = escolhidas.length; }
+        const b = $('#confirmarImportar', fundo);
+        if (b){ b.disabled = escolhidas.length === 0; }
+        return escolhidas;
+      }
+
+      $$('[data-linha]', fundo).forEach(function(ck){
+        ck.addEventListener('change', function(){
+          const i = Number(ck.dataset.linha);
+          if (ck.checked){ delete desmarcadas[i]; } else { desmarcadas[i] = true; }
+          const tr = ck.closest('tr');
+          if (tr){ tr.classList.toggle('fora', !ck.checked); }
+          atualizarConta();
+        });
+      });
+
+      $('#marcarTodas', fundo).addEventListener('click', function(){
+        desmarcadas = {};
+        desenharConferencia();
+      });
+      $('#desmarcarTodas', fundo).addEventListener('click', function(){
+        prontas.forEach(function(m, i){ if (!m.repetida){ desmarcadas[i] = true; } });
+        desenharConferencia();
+      });
+
       const botao = $('#confirmarImportar', fundo);
-      if (botao && novas.length){
-        botao.addEventListener('click', function(){ passoImportar(fundo, novas); });
+      if (botao){
+        botao.addEventListener('click', function(){
+          const escolhidas = atualizarConta();
+          if (escolhidas.length){ passoImportar(fundo, escolhidas); }
+        });
       }
     }
 
