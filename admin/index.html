@@ -1312,8 +1312,14 @@ tr.escolhida{background:rgba(212,160,23,.09)}
     pularJaRecebeu: true,
     buscaHistorico: '',
     fila: null,
-    filaIndice: 0
+    filaIndice: 0,
+    remetenteReal: ''
   };
+
+  /* o endereço que sai de verdade é decidido lá no Supabase, então
+     o painel só descobre depois do primeiro teste. Guardo aqui para
+     a prévia não mentir dizendo que sai do Gmail dela. */
+  try{ pros.remetenteReal = localStorage.getItem('remetente-real') || ''; }catch(e){}
 
   function personalizar(texto, nomeDaMarca){
     const completo = String(nomeDaMarca || '').trim();
@@ -1653,6 +1659,10 @@ tr.escolhida{background:rgba(212,160,23,.09)}
     botao.disabled = false;
     botao.textContent = 'enviar teste para mim';
 
+    if (r.ok && r.corpo && r.corpo.remetente){
+      pros.remetenteReal = r.corpo.remetente;
+      try{ localStorage.setItem('remetente-real', pros.remetenteReal); }catch(e){}
+    }
     if (!r.ok || r.corpo.erro){
       abrirJanela('Não deu para mandar o teste',
         '<p style="font-size:.88rem">' + escapar(r.corpo.erro || 'O carteiro recusou.') + '</p>' +
@@ -1662,7 +1672,8 @@ tr.escolhida{background:rgba(212,160,23,.09)}
     }
     await recarregarEnvios();
     abrirJanela('Teste enviado',
-      '<p style="font-size:.9rem">Mandei para <b>' + escapar(EMAIL_CONTATO) + '</b>.</p>' +
+      '<p style="font-size:.9rem">Mandei para <b>' + escapar(EMAIL_CONTATO) + '</b>, ' +
+      'saindo de <b>' + escapar(enderecoDoRemetente() || 'um endereço do Resend') + '</b>.</p>' +
       '<p style="font-size:.86rem;color:var(--tinta-suave)">Abra no celular e confira se o nome da marca entrou ' +
       'nos lugares certos antes de disparar para valer.</p>' +
       '<div class="janela-pe"><button class="botao" type="button" data-fechar>fechar</button></div>');
@@ -1895,9 +1906,14 @@ tr.escolhida{background:rgba(212,160,23,.09)}
       '</div>' +
       (pros.motor === 'rascunho'
         ? '<p class="aviso-origem">No modo rascunho nada é enviado sozinho. O painel monta o e-mail de cada marca, ' +
-          'já com o nome dela dentro, e você manda pelo seu Gmail, uma por vez. Funciona sem configurar nada.</p>'
-        : '<p class="aviso-origem">No modo automático o disparo sai sozinho. Enquanto você não tiver um domínio ' +
-          'verificado no Resend, ele só consegue entregar para o seu próprio e-mail.</p>') +
+          'já com o nome dela dentro, e você manda pelo seu Gmail, uma por vez. Funciona sem configurar nada, ' +
+          'e sai do seu endereço de verdade.</p>'
+        : '<p class="aviso-origem">Sai de <b>' + escapar(enderecoDoRemetente() || 'um endereço do Resend, que aparece aqui depois do primeiro teste') + '</b>. ' +
+          'A resposta da marca cai no seu ' + escapar(EMAIL_CONTATO) + '.' +
+          (enderecoDoRemetente().indexOf('resend.dev') >= 0
+            ? ' Esse endereço é o de testes do Resend, e com ele só o seu próprio e-mail recebe. ' +
+              'Para sair do seu domínio, verifique um domínio no Resend e crie o segredo RESEND_FROM no Supabase.'
+            : '') + '</p>') +
     '</div>';
 
     html += '<div class="caixa">' +
@@ -1981,13 +1997,25 @@ tr.escolhida{background:rgba(212,160,23,.09)}
   }
 
   function cabecaDoEmail(exemplo){
+    const de = pros.motor === 'rascunho'
+      ? EMAIL_CONTATO
+      : (enderecoDoRemetente() || 'endereço do Resend');
     return '<div class="email-cabeca">' +
       '<span class="email-avatar">' + escapar(NOME_REMETENTE.charAt(0)) + '</span>' +
       '<span><span class="email-assunto" style="display:block">' +
         escapar(personalizar(pros.assunto, exemplo) || 'o seu assunto aparece aqui') + '</span>' +
         '<span class="email-de" style="display:block">' + escapar(NOME_REMETENTE) + ' &lt;' +
-        escapar(EMAIL_CONTATO) + '&gt; para você</span></span>' +
+        escapar(de) + '&gt; para você</span>' +
+        (pros.motor === 'rascunho' ? '' :
+          '<span class="email-de" style="display:block">responder vai para ' + escapar(EMAIL_CONTATO) + '</span>') +
+      '</span>' +
     '</div>';
+  }
+
+  /* tira só o endereço de dentro de algo como Nome <x@y.com> */
+  function enderecoDoRemetente(){
+    const m = String(pros.remetenteReal || '').match(/<([^>]+)>/);
+    return m ? m[1] : (pros.remetenteReal || '');
   }
 
   function blocoHistorico(){
