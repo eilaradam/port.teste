@@ -49,6 +49,11 @@ create table if not exists public.marcas (
   constraint situacao_valida check (situacao in ('lead','conversando','cliente','parada'))
 );
 
+-- O nicho de cada marca. Fica fora do create table porque a
+-- tabela pode já existir: assim dá para rodar este arquivo de novo
+-- que ele só acrescenta a coluna que falta, sem mexer no resto.
+alter table public.marcas add column if not exists nicho text not null default '';
+
 -- A sua agenda: o que gravar, editar e postar em cada dia.
 create table if not exists public.calendario (
   id         bigint generated always as identity primary key,
