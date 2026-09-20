@@ -1169,6 +1169,7 @@ textarea.transcricao:focus{outline:none;background:#fff;border-color:var(--amare
 
   function desenharMarcas(){
     $('#acaoDaAba').innerHTML =
+      '<button class="botao claro" type="button" id="importarMarcas">importar planilha</button> ' +
       '<button class="botao claro" type="button" id="baixarMarcas">baixar CSV</button> ' +
       '<button class="botao" type="button" id="novaMarca">+ nova marca</button>';
 
@@ -1221,6 +1222,7 @@ textarea.transcricao:focus{outline:none;background:#fff;border-color:var(--amare
 
     $('#novaMarca').addEventListener('click', function(){ formMarca(null); });
     $('#baixarMarcas').addEventListener('click', function(){ baixarCSV('marcas', lista); });
+    $('#importarMarcas').addEventListener('click', janelaImportar);
     const busca = $('#buscaMarcas');
     busca.addEventListener('input', function(){
       buscaMarcas = busca.value;
@@ -1297,6 +1299,381 @@ textarea.transcricao:focus{outline:none;background:#fff;border-color:var(--amare
       avisinho(novo ? 'Marca adicionada.' : 'Marca salva.');
       desenharMarcas();
     });
+  }
+
+  /* =====================================================================
+     IMPORTAR PLANILHA DE LEADS
+     Aguenta CSV salvo pelo Excel, pelo Google Planilhas, e também
+     colar direto as células copiadas da planilha aberta.
+     ===================================================================== */
+
+  /* descobre sozinho se a planilha separa por ponto e vírgula,
+     por vírgula ou por tabulação, olhando a primeira linha */
+  function descobrirSeparador(texto){
+    const primeira = String(texto).split(/\r?\n/)[0] || '';
+    const contas = { ';':0, ',':0, '\t':0 };
+    let dentroDeAspas = false;
+    for (let i = 0; i < primeira.length; i++){
+      const c = primeira[i];
+      if (c === '"'){ dentroDeAspas = !dentroDeAspas; continue; }
+      if (!dentroDeAspas && contas[c] !== undefined){ contas[c]++; }
+    }
+    let melhor = ',', maior = 0;
+    Object.keys(contas).forEach(function(sep){ if (contas[sep] > maior){ maior = contas[sep]; melhor = sep; } });
+    return melhor;
+  }
+
+  /* transforma o texto da planilha em linhas e colunas.
+     Respeita campo entre aspas, com separador e quebra de linha
+     dentro, e tira o marcador invisível que o Excel põe no começo. */
+  function lerPlanilha(texto){
+    texto = String(texto || '').replace(/^\uFEFF/, '');
+    const separador = descobrirSeparador(texto);
+    const linhas = [];
+    let campo = '', linha = [], dentroDeAspas = false;
+
+    for (let i = 0; i < texto.length; i++){
+      const c = texto[i];
+      if (dentroDeAspas){
+        if (c === '"'){
+          if (texto[i+1] === '"'){ campo += '"'; i++; }
+          else { dentroDeAspas = false; }
+        } else { campo += c; }
+        continue;
+      }
+      if (c === '"'){ dentroDeAspas = true; continue; }
+      if (c === separador){ linha.push(campo); campo = ''; continue; }
+      if (c === '\n'){ linha.push(campo); linhas.push(linha); linha = []; campo = ''; continue; }
+      if (c === '\r'){ continue; }
+      campo += c;
+    }
+    if (campo !== '' || linha.length){ linha.push(campo); linhas.push(linha); }
+
+    return linhas.filter(function(l){
+      return l.some(function(c){ return String(c).trim() !== ''; });
+    });
+  }
+
+  /* os campos da tabela marcas e as palavras que costumam
+     aparecer no cabeçalho de uma planilha para cada um deles */
+  const CAMPOS_MARCA = [
+    { chave:'nome',           rotulo:'marca',           pistas:['marca','nome','empresa','cliente','fantasia','razao social'] },
+    { chave:'instagram',      rotulo:'instagram',       pistas:['instagram','insta','arroba','perfil','usuario','handle'] },
+    { chave:'email',          rotulo:'e-mail',          pistas:['email','e mail','mail','correio'] },
+    { chave:'telefone',       rotulo:'telefone',        pistas:['telefone','whatsapp','whats','celular','fone','tel','zap'] },
+    { chave:'situacao',       rotulo:'situação',        pistas:['situacao','status','etapa','estagio','fase'] },
+    { chave:'obs',            rotulo:'observação',      pistas:['obs','observacao','anotacao','nota','comentario','descricao','detalhe'] },
+    { chave:'ultimo_contato', rotulo:'último contato',  pistas:['ultimo contato','ultimo retorno','data do contato','data'] }
+  ];
+
+  function limparCabecalho(t){
+    return semAcento(t).replace(/[^a-z0-9]+/g, ' ').trim();
+  }
+
+  /* dá nota para cada combinação de coluna e campo, e fica com as
+     melhores, sem deixar duas colunas caírem no mesmo campo */
+  function adivinharColunas(cabecalho){
+    const limpos = cabecalho.map(limparCabecalho);
+    const notas = [];
+    CAMPOS_MARCA.forEach(function(campo){
+      limpos.forEach(function(titulo, i){
+        if (!titulo){ return; }
+        let nota = 0;
+        campo.pistas.forEach(function(pista){
+          if (titulo === pista){ nota = Math.max(nota, 3); }
+          else if (titulo.indexOf(pista) === 0){ nota = Math.max(nota, 2); }
+          else if (titulo.indexOf(pista) > 0){ nota = Math.max(nota, 1); }
+        });
+        if (nota > 0){ notas.push({ campo: campo.chave, coluna: i, nota: nota }); }
+      });
+    });
+    notas.sort(function(a,b){ return b.nota - a.nota; });
+
+    const escolha = {};
+    const colunasUsadas = {};
+    notas.forEach(function(n){
+      if (escolha[n.campo] !== undefined || colunasUsadas[n.coluna]){ return; }
+      escolha[n.campo] = n.coluna;
+      colunasUsadas[n.coluna] = true;
+    });
+    return escolha;
+  }
+
+  /* arruma o que vem da planilha para o formato da tabela */
+  function situacaoNormal(v){
+    const t = semAcento(v);
+    if (!t){ return 'lead'; }
+    if (t.indexOf('client') >= 0 || t.indexOf('fechad') >= 0 || t.indexOf('ganho') >= 0){ return 'cliente'; }
+    if (t.indexOf('convers') >= 0 || t.indexOf('negoci') >= 0 || t.indexOf('andamento') >= 0 ||
+        t.indexOf('proposta') >= 0 || t.indexOf('respond') >= 0){ return 'conversando'; }
+    if (t.indexOf('parad') >= 0 || t.indexOf('perdid') >= 0 || t.indexOf('frio') >= 0 ||
+        t.indexOf('recus') >= 0 || t.indexOf('sem retorno') >= 0 || t.indexOf('encerrad') >= 0){ return 'parada'; }
+    return 'lead';
+  }
+
+  function dataNormal(v){
+    const t = String(v || '').trim();
+    if (!t){ return null; }
+    let m = t.match(/^(\d{4})-(\d{1,2})-(\d{1,2})/);
+    if (m){ return m[1] + '-' + String(m[2]).padStart(2,'0') + '-' + String(m[3]).padStart(2,'0'); }
+    m = t.match(/^(\d{1,2})[\/.\-](\d{1,2})[\/.\-](\d{2,4})/);
+    if (m){
+      let ano = m[3];
+      if (ano.length === 2){ ano = '20' + ano; }
+      return ano + '-' + String(m[2]).padStart(2,'0') + '-' + String(m[1]).padStart(2,'0');
+    }
+    return null;
+  }
+
+  function instagramNormal(v){
+    let t = String(v || '').trim();
+    if (!t){ return ''; }
+    t = t.replace(/^https?:\/\/(www\.)?instagram\.com\//i, '')
+         .replace(/[?\/].*$/, '')
+         .replace(/^@+/, '')
+         .trim();
+    return t ? '@' + t : '';
+  }
+
+  /* lê o arquivo. Se vier com acento quebrado, que é o caso de
+     planilha antiga do Excel, lê de novo no formato antigo. */
+  function lerArquivo(arquivo, aoTerminar){
+    const leitor = new FileReader();
+    leitor.onerror = function(){ avisinho('Não consegui abrir esse arquivo.'); };
+    leitor.onload = function(){
+      const texto = String(leitor.result || '');
+      if (texto.indexOf('\uFFFD') >= 0){
+        const leitor2 = new FileReader();
+        leitor2.onload = function(){ aoTerminar(String(leitor2.result || '')); };
+        leitor2.onerror = function(){ aoTerminar(texto); };
+        leitor2.readAsText(arquivo, 'ISO-8859-1');
+        return;
+      }
+      aoTerminar(texto);
+    };
+    leitor.readAsText(arquivo, 'UTF-8');
+  }
+
+  function janelaImportar(){
+    const fundo = abrirJanela('Importar a sua planilha de leads', '<div id="passoImportar"></div>', true);
+    passoEscolherArquivo(fundo);
+  }
+
+  function passoEscolherArquivo(fundo){
+    $('#passoImportar', fundo).innerHTML =
+      '<p style="font-size:.88rem;color:var(--tinta-suave);margin-bottom:14px">' +
+      'Traga a sua planilha de duas formas, a que for mais fácil para você.</p>' +
+
+      '<div class="caixa" style="margin-bottom:12px">' +
+        '<p class="caixa-titulo">jeito 1 · mandar o arquivo</p>' +
+        '<input type="file" id="arquivoPlanilha" accept=".csv,.txt,text/csv,text/plain" style="font-size:.85rem">' +
+        '<p style="font-size:.78rem;color:var(--apagado);margin-top:8px">' +
+        'Se a sua planilha for do Excel ou do Google Planilhas, use Arquivo, Baixar, e escolha CSV.</p>' +
+      '</div>' +
+
+      '<div class="caixa" style="margin-bottom:0">' +
+        '<p class="caixa-titulo">jeito 2 · colar direto da planilha</p>' +
+        '<textarea class="transcricao" id="coladoPlanilha" style="min-height:130px" ' +
+        'placeholder="Abra a sua planilha, selecione as células com o cabeçalho junto, copie e cole aqui."></textarea>' +
+        '<button class="botao" type="button" id="lerColado" style="margin-top:10px">ler o que eu colei</button>' +
+      '</div>';
+
+    $('#arquivoPlanilha', fundo).addEventListener('change', function(ev){
+      const arquivo = ev.target.files && ev.target.files[0];
+      if (!arquivo){ return; }
+      lerArquivo(arquivo, function(texto){ passoConferir(fundo, texto); });
+    });
+    $('#lerColado', fundo).addEventListener('click', function(){
+      const texto = $('#coladoPlanilha', fundo).value;
+      if (!texto.trim()){ avisinho('Cole a planilha no campo primeiro.'); return; }
+      passoConferir(fundo, texto);
+    });
+  }
+
+  function passoConferir(fundo, texto){
+    const linhas = lerPlanilha(texto);
+    if (linhas.length < 2){
+      $('#passoImportar', fundo).innerHTML =
+        '<p class="vazio">Só consegui ler ' + linhas.length + ' linha nessa planilha. ' +
+        'Confira se ela tem uma linha de cabeçalho e pelo menos uma marca embaixo.</p>' +
+        '<div class="janela-pe"><button class="botao claro" type="button" id="voltarEscolher">tentar de novo</button></div>';
+      $('#voltarEscolher', fundo).addEventListener('click', function(){ passoEscolherArquivo(fundo); });
+      return;
+    }
+
+    const cabecalho = linhas[0].map(function(c){ return String(c).trim(); });
+    const corpo = linhas.slice(1);
+    let mapa = adivinharColunas(cabecalho);
+
+    function desenharConferencia(){
+      const opcoesColuna = [{ v:'', t:'não importar' }].concat(cabecalho.map(function(c,i){
+        return { v:String(i), t:(c || 'coluna ' + (i+1)) };
+      }));
+
+      let html = '<p style="font-size:.88rem;margin-bottom:4px">' +
+        'Li <b>' + corpo.length + '</b> ' + (corpo.length === 1 ? 'linha' : 'linhas') + ' na sua planilha. ' +
+        'Confira se eu adivinhei as colunas certas e corrija o que estiver trocado.</p>' +
+        '<p style="font-size:.78rem;color:var(--apagado);margin-bottom:14px">' +
+        'A primeira linha foi tratada como cabeçalho.</p>';
+
+      html += CAMPOS_MARCA.map(function(campo){
+        const atual = mapa[campo.chave] === undefined ? '' : String(mapa[campo.chave]);
+        return '<div class="campo" style="display:grid;grid-template-columns:120px 1fr;align-items:center;gap:10px;margin-bottom:8px">' +
+          '<label for="de-' + campo.chave + '" style="margin:0">' + escapar(campo.rotulo) + '</label>' +
+          '<select id="de-' + campo.chave + '" data-campo="' + campo.chave + '">' +
+            opcoesColuna.map(function(o){
+              return '<option value="' + escapar(o.v) + '"' + (o.v === atual ? ' selected' : '') + '>' + escapar(o.t) + '</option>';
+            }).join('') +
+          '</select></div>';
+      }).join('');
+
+      const prontas = montarMarcas(corpo, mapa);
+      const novas = prontas.filter(function(x){ return !x.repetida; });
+      const repetidas = prontas.length - novas.length;
+
+      html += '<div class="caixa" style="margin-top:14px"><p class="caixa-titulo">como as três primeiras vão entrar</p>';
+      if (!novas.length){
+        html += '<p class="vazio">Nenhuma linha nova para importar. Confira se a coluna da marca está apontada certo.</p>';
+      } else {
+        html += '<div class="rolagem"><table><thead><tr><th>marca</th><th>instagram</th><th>e-mail</th><th>telefone</th><th>situação</th></tr></thead><tbody>' +
+          novas.slice(0,3).map(function(m){
+            return '<tr><td><strong>' + escapar(m.nome || 'sem nome') + '</strong></td>' +
+              '<td>' + escapar(m.instagram || '·') + '</td>' +
+              '<td>' + escapar(m.email || '·') + '</td>' +
+              '<td>' + escapar(m.telefone || '·') + '</td>' +
+              '<td><span class="pilula p-' + escapar(m.situacao) + '">' + escapar(rotuloSituacao(m.situacao)) + '</span></td></tr>';
+          }).join('') + '</tbody></table></div>';
+      }
+      html += '</div>';
+
+      if (repetidas > 0){
+        html += '<p class="tr-dica" style="margin-top:12px">Encontrei <b>' + repetidas + '</b> ' +
+          (repetidas === 1 ? 'linha que já está' : 'linhas que já estão') +
+          ' na sua base, pelo e-mail, pelo @ ou pelo nome. ' +
+          (repetidas === 1 ? 'Ela não entra' : 'Elas não entram') + ' de novo, para não duplicar.</p>';
+      }
+
+      html += '<div class="janela-pe">' +
+        '<button class="botao claro" type="button" id="voltarEscolher">voltar</button>' +
+        '<button class="botao" type="button" id="confirmarImportar"' + (novas.length ? '' : ' disabled') + '>' +
+        'importar ' + novas.length + (novas.length === 1 ? ' marca' : ' marcas') + '</button></div>';
+
+      $('#passoImportar', fundo).innerHTML = html;
+
+      $$('[data-campo]', fundo).forEach(function(sel){
+        sel.addEventListener('change', function(){
+          const valor = sel.value;
+          Object.keys(mapa).forEach(function(k){
+            if (k !== sel.dataset.campo && String(mapa[k]) === valor && valor !== ''){ delete mapa[k]; }
+          });
+          if (valor === ''){ delete mapa[sel.dataset.campo]; }
+          else { mapa[sel.dataset.campo] = Number(valor); }
+          desenharConferencia();
+        });
+      });
+      $('#voltarEscolher', fundo).addEventListener('click', function(){ passoEscolherArquivo(fundo); });
+      const botao = $('#confirmarImportar', fundo);
+      if (botao && novas.length){
+        botao.addEventListener('click', function(){ passoImportar(fundo, novas); });
+      }
+    }
+
+    desenharConferencia();
+  }
+
+  /* monta as marcas prontas para o banco e marca as repetidas */
+  function montarMarcas(corpo, mapa){
+    const jaTem = { email:{}, instagram:{}, nome:{} };
+    dados.marcas.forEach(function(m){
+      if (m.email){ jaTem.email[semAcento(m.email)] = true; }
+      if (m.instagram){ jaTem.instagram[semAcento(m.instagram).replace('@','')] = true; }
+      if (m.nome){ jaTem.nome[semAcento(m.nome)] = true; }
+    });
+
+    function pegar(linha, campo){
+      const i = mapa[campo];
+      if (i === undefined){ return ''; }
+      return String(linha[i] === undefined ? '' : linha[i]).trim();
+    }
+
+    return corpo.map(function(linha){
+      const nome = pegar(linha, 'nome');
+      const instagram = instagramNormal(pegar(linha, 'instagram'));
+      const email = pegar(linha, 'email');
+      const marca = {
+        nome: nome,
+        instagram: instagram,
+        email: email,
+        telefone: pegar(linha, 'telefone'),
+        situacao: situacaoNormal(pegar(linha, 'situacao')),
+        obs: pegar(linha, 'obs'),
+        ultimo_contato: dataNormal(pegar(linha, 'ultimo_contato'))
+      };
+      const chaveEmail = semAcento(email);
+      const chaveInsta = semAcento(instagram).replace('@','');
+      const chaveNome = semAcento(nome);
+      marca.repetida = !!(
+        (chaveEmail && jaTem.email[chaveEmail]) ||
+        (chaveInsta && jaTem.instagram[chaveInsta]) ||
+        (chaveNome && jaTem.nome[chaveNome])
+      );
+      /* o que entrar agora também conta como já existente, para a
+         própria planilha não duplicar dentro dela mesma */
+      if (!marca.repetida){
+        if (chaveEmail){ jaTem.email[chaveEmail] = true; }
+        if (chaveInsta){ jaTem.instagram[chaveInsta] = true; }
+        if (chaveNome){ jaTem.nome[chaveNome] = true; }
+      }
+      return marca;
+    }).filter(function(m){
+      /* linha sem nome, sem e-mail e sem @ não serve para nada */
+      return m.nome || m.email || m.instagram;
+    });
+  }
+
+  async function passoImportar(fundo, novas){
+    $('#passoImportar', fundo).innerHTML =
+      '<p style="font-size:.9rem">Mandando para o banco, um pedaço por vez.</p>' +
+      '<p id="andamento" style="font-size:.85rem;color:var(--tinta-suave);margin-top:8px">0 de ' + novas.length + '</p>' +
+      '<div class="trilho" style="margin-top:10px"><div class="cheio" id="barraImport" style="width:0%"></div></div>';
+
+    const pedaco = 50;
+    let entraram = 0, falharam = 0;
+
+    for (let i = 0; i < novas.length; i += pedaco){
+      const lote = novas.slice(i, i + pedaco).map(function(m){
+        const copia = Object.assign({}, m);
+        delete copia.repetida;
+        return copia;
+      });
+      try{
+        const r = await sb.from('marcas').insert(lote).select();
+        if (r.error){ throw r.error; }
+        const chegaram = (r.data || []);
+        chegaram.forEach(function(linha){ dados.marcas.push(linha); });
+        entraram += chegaram.length;
+      }catch(e){
+        falharam += lote.length;
+      }
+      const feito = Math.min(i + pedaco, novas.length);
+      $('#andamento', fundo).textContent = feito + ' de ' + novas.length;
+      $('#barraImport', fundo).style.width = Math.round((feito / novas.length) * 100) + '%';
+    }
+
+    let fim = '<p style="font-size:.95rem;font-weight:800;margin-bottom:6px">Pronto.</p>' +
+      '<p style="font-size:.88rem">Entraram <b>' + entraram + '</b> ' +
+      (entraram === 1 ? 'marca' : 'marcas') + ' na sua base.</p>';
+    if (falharam){
+      fim += '<p class="tr-dica" style="margin-top:10px">' + falharam + ' ' +
+        (falharam === 1 ? 'linha não entrou' : 'linhas não entraram') +
+        '. Pode ser algum campo fora do formato. Tente importar só essas de novo, ou me chame.</p>';
+    }
+    fim += '<div class="janela-pe"><button class="botao" type="button" data-fechar>fechar</button></div>';
+    $('#passoImportar', fundo).innerHTML = fim;
+    $$('[data-fechar]', fundo).forEach(function(b){ b.addEventListener('click', fecharJanela); });
+
+    avisinho(entraram + ' marcas importadas.');
+    desenharMarcas();
   }
 
   /* CSV com ponto e vírgula e com o marcador do começo (BOM),
