@@ -170,7 +170,8 @@ td{padding:9px 10px;border-bottom:1px solid var(--borda-leve);vertical-align:mid
 tbody tr:hover{background:rgba(212,160,23,.06)}
 tbody tr.clicavel{cursor:pointer}
 tr.escondida td:not(.acoes){opacity:.45}
-tr.favorita{box-shadow:inset 3px 0 0 var(--amarelo)}
+tr.favorita{box-shadow:inset 3px 0 0 var(--amarelo);background:rgba(212,160,23,.055)}
+tr.ultima-fixada td{border-bottom:2px solid var(--amarelo)}
 .acoes{white-space:nowrap;text-align:right}
 .mini{
   background:none;border:1px solid var(--borda);border-radius:7px;
@@ -1254,6 +1255,7 @@ textarea.transcricao:focus{outline:none;background:#fff;border-color:var(--amare
   let buscaMarcas = '';
   let filtroSituacao = 'todas';
   let filtroNicho = 'todos';
+  let soFavoritas = false;
 
   function desenharMarcas(){
     $('#acaoDaAba').innerHTML =
@@ -1263,13 +1265,21 @@ textarea.transcricao:focus{outline:none;background:#fff;border-color:var(--amare
       '<button class="botao" type="button" id="novaMarca">+ nova marca</button>';
 
     const lista = dados.marcas.filter(function(m){
+      if (soFavoritas && !m.favorita){ return false; }
       if (filtroSituacao !== 'todas' && m.situacao !== filtroSituacao){ return false; }
       if (filtroNicho === 'sem' && (m.nicho || '')){ return false; }
       if (filtroNicho !== 'todos' && filtroNicho !== 'sem' && m.nicho !== filtroNicho){ return false; }
       if (!buscaMarcas){ return true; }
       const alvo = semAcento((m.nome||'') + ' ' + (m.instagram||'') + ' ' + (m.email||''));
       return alvo.indexOf(semAcento(buscaMarcas)) >= 0;
+    }).sort(function(a,b){
+      /* as fixadas sobem para o topo, o resto continua em ordem de nome */
+      const fa = a.favorita ? 1 : 0, fb = b.favorita ? 1 : 0;
+      if (fa !== fb){ return fb - fa; }
+      return semAcento(a.nome) < semAcento(b.nome) ? -1 : (semAcento(a.nome) > semAcento(b.nome) ? 1 : 0);
     });
+
+    const fixadas = dados.marcas.filter(function(m){ return m.favorita; }).length;
 
     let html = '<div class="barra-ferramentas">' +
       '<input class="busca" id="buscaMarcas" type="search" placeholder="buscar por nome, @ ou e-mail" value="' + escapar(buscaMarcas) + '">' +
@@ -1277,6 +1287,7 @@ textarea.transcricao:focus{outline:none;background:#fff;border-color:var(--amare
       SITUACOES.map(function(s){
         return '<button class="chip" type="button" data-sit="' + s.v + '" aria-pressed="' + (filtroSituacao===s.v) + '">' + s.t + '</button>';
       }).join('') +
+      '<button class="chip" type="button" id="soFav" aria-pressed="' + soFavoritas + '">só as fixadas</button>' +
       '<select id="filtroNicho" class="chip" style="padding-right:26px">' +
         '<option value="todos"' + (filtroNicho==='todos'?' selected':'') + '>todos os nichos</option>' +
         '<option value="sem"' + (filtroNicho==='sem'?' selected':'') + '>sem nicho</option>' +
@@ -1293,13 +1304,23 @@ textarea.transcricao:focus{outline:none;background:#fff;border-color:var(--amare
       html += '<p class="vazio">Nenhuma marca com esse filtro. Tente limpar a busca.</p>';
     } else {
       html += '<div class="rolagem"><table><thead><tr>' +
+        '<th style="width:34px"></th>' +
         '<th>marca</th><th>nicho</th><th>instagram</th><th>e-mail</th><th>telefone</th>' +
         '<th>situação</th><th>observação</th><th>último contato</th><th></th>' +
         '</tr></thead><tbody>' +
         lista.map(function(m){
           const tel = String(m.telefone || '').replace(/\D/g,'');
           const arroba = String(m.instagram || '').replace('@','').trim();
-          return '<tr class="clicavel" data-marca="' + m.id + '">' +
+          const ultimaFixada = m.favorita && !soFavoritas &&
+            lista[lista.indexOf(m) + 1] && !lista[lista.indexOf(m) + 1].favorita;
+          return '<tr class="clicavel' + (m.favorita ? ' favorita' : '') +
+                 (ultimaFixada ? ' ultima-fixada' : '') + '" data-marca="' + m.id + '">' +
+            '<td><button class="estrela ' + (m.favorita ? 'marcada' : '') + '" type="button" ' +
+              'data-fixar="' + m.id + '" data-parar aria-label="' +
+              (m.favorita ? 'Tirar do topo' : 'Fixar no topo') + '" title="' +
+              (m.favorita ? 'fixada no topo, clique para soltar' : 'clique para fixar no topo') + '">' +
+              '<svg viewBox="0 0 24 24"><path d="M12 3l2.7 5.6 6.1.9-4.4 4.3 1 6.1-5.4-2.9-5.4 2.9 1-6.1L3.2 9.5l6.1-.9z"/></svg>' +
+            '</button></td>' +
             '<td><strong>' + escapar(m.nome || 'sem nome') + '</strong></td>' +
             '<td>' + (m.nicho
               ? '<span class="pilula p-nicho">' + escapar(rotuloNicho(m.nicho)) + '</span>'
@@ -1315,7 +1336,10 @@ textarea.transcricao:focus{outline:none;background:#fff;border-color:var(--amare
               '<button class="mini perigo" type="button" data-apagar-marca="' + m.id + '" data-parar aria-label="Apagar"><svg viewBox="0 0 24 24"><path d="M3 6h18M8 6V4h8v2M19 6l-1 14H6L5 6"/></svg></button>' +
             '</td></tr>';
         }).join('') + '</tbody></table></div>' +
-        '<p style="margin-top:10px;font-size:.78rem;color:var(--apagado)">' + lista.length + ' de ' + dados.marcas.length + ' marcas. Clique na linha para editar.</p>';
+        '<p style="margin-top:10px;font-size:.78rem;color:var(--apagado)">' +
+          lista.length + ' de ' + dados.marcas.length + ' marcas' +
+          (fixadas ? ' · ' + fixadas + (fixadas === 1 ? ' fixada no topo' : ' fixadas no topo') : '') +
+          '. Clique na linha para editar, ou na estrela para fixar.</p>';
     }
     html += '</div>';
 
@@ -1341,11 +1365,26 @@ textarea.transcricao:focus{outline:none;background:#fff;border-color:var(--amare
       filtroNicho = $('#filtroNicho').value;
       desenharMarcas();
     });
+    $('#soFav').addEventListener('click', function(){ soFavoritas = !soFavoritas; desenharMarcas(); });
     $$('[data-marca]').forEach(function(tr){
       tr.addEventListener('click', function(ev){
         if (ev.target.closest('[data-parar]')){ return; }
         const m = dados.marcas.filter(function(x){ return String(x.id) === tr.dataset.marca; })[0];
         formMarca(m);
+      });
+    });
+    $$('[data-fixar]').forEach(function(b){
+      b.addEventListener('click', async function(ev){
+        ev.stopPropagation();
+        const m = dados.marcas.filter(function(x){ return String(x.id) === b.dataset.fixar; })[0];
+        if (!m){ return; }
+        const novo = !m.favorita;
+        const r = await gravar('marcas', { id:m.id, favorita:novo });
+        if (r.ok){
+          m.favorita = novo;
+          avisinho(novo ? 'Fixada no topo.' : 'Solta do topo.');
+          desenharMarcas();
+        }
       });
     });
     $$('[data-apagar-marca]').forEach(function(b){

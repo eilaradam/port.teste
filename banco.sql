@@ -54,6 +54,10 @@ create table if not exists public.marcas (
 -- que ele só acrescenta a coluna que falta, sem mexer no resto.
 alter table public.marcas add column if not exists nicho text not null default '';
 
+-- As marcas que você fixa no topo da lista, para não sumirem no
+-- meio das outras trezentas.
+alter table public.marcas add column if not exists favorita boolean not null default false;
+
 -- A sua agenda: o que gravar, editar e postar em cada dia.
 create table if not exists public.calendario (
   id         bigint generated always as identity primary key,
